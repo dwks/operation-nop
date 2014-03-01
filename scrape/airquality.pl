@@ -5,6 +5,8 @@ my $counter = 0;
 
 my @data = `curl --silent "$url"`;
 
+print "ID|TIME|VALUE|MAX\n";
+
 for(my $count = 0; $count < @data; $count ++) {
     my $line = $data[$count];
     $line =~ s/\s+$//;
@@ -13,7 +15,7 @@ for(my $count = 0; $count < @data; $count ++) {
 
     my ($year, $average, $peak) = split /,/, $line;
 
-    #last if($year eq '');  # end of data
-    print "$counter $year $average $peak\n";
+    last if($year eq '');  # end of data
+    print "$counter|$year|$average|$peak\n";
     $counter ++;
 }
