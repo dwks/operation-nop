@@ -5,18 +5,19 @@ import constants
 import db_helper
 import json
 import operator
+import users
 
 
-def ValidateArg(request, name, argType, remarks=None):
+def ValidateArg(request, name, arg_type, remarks=None):
     result_str = request.get(name, None)
     if not result_str:
         raise HelperException('missing arg ' + name)
-    if argType == 'float':
+    if arg_type == 'float':
         try:
             result = float(result_str)
         except ValueError as e:
             raise HelperException('invalid value for ' + name + ' - ' + str(e))
-    elif argType == 'int':
+    elif arg_type == 'int':
         try:
             result = int(result_str)
         except ValueError as e:
@@ -29,8 +30,12 @@ def ValidateArg(request, name, argType, remarks=None):
                                           remarks + ')')
             else:
                 raise HelperException('unknown remarks: ' + remarks)
+    elif arg_type == 'str':
+        if not isinstance(result_str, (str, unicode)):
+            raise HelperException('invalid str type: ' + str(type(result_str)))
+        result = result_str
     else:
-        raise HelperException('unknwon arg type: ' + argType)
+        raise HelperException('unknwon arg type: ' + arg_type)
 
     return result
 
@@ -70,6 +75,7 @@ def FindCloseClinics(pos_x, pos_y, min_results, max_results):
 
     return SortByDistance(rows, pos_x, pos_y, max_results)
 
+
 def SortByDistance(rows, pos_x, pos_y, max_results):
     dist_map = {}
     schema_map = db_helper.GetSchemaMap()
@@ -91,6 +97,16 @@ def SortByDistance(rows, pos_x, pos_y, max_results):
         result.append(rows[index])
 
     return result
+
+
+def LoginOrCreateUser(username, password):
+    if users.CheckUserExists(username):
+        if not users.CheckUserAndPassword(username, password):
+            raise HelperException('Invalid password')
+    else:
+        users.CreateUser(username, password)
+
+    return users.GetUserSessionId(username)
 
 
 class HelperException(Exception):
