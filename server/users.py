@@ -17,8 +17,8 @@ def CreateUser(username, password):
     db_helper.CreateTable(TABLE_NAME + '_' + username)
 
 
-def CheckUserSessionId(username, session_id):
-    pass
+def CheckSessionId(session_id):
+    return True
 
 
 def GetUserSessionId(username):
