@@ -5,9 +5,15 @@ def ValidateArg(request, name, argType, remarks=None):
     if not result_str:
         raise HelperException('missing arg ' + name)
     if argType == 'float':
-        result = float(result_str)
+        try:
+            result = float(result_str)
+        except ValueError as e:
+            raise HelperException('invalid value for ' + name + ' - ' + str(e))
     elif argType == 'int':
-        result = int(result_str)
+        try:
+            result = int(result_str)
+        except ValueError as e:
+            raise HelperException('invalid value for ' + name + ' - ' + str(e))
         if remarks:
             if remarks == 'positive':
                 if result <= 0:
