@@ -1,5 +1,8 @@
 #!/usr/bin/python2.7
 
+# from db import db_helper
+
+
 def ValidateArg(request, name, argType, remarks=None):
     result_str = request.get(name, None)
     if not result_str:
@@ -26,6 +29,10 @@ def ValidateArg(request, name, argType, remarks=None):
         raise HelperException('unknwon arg type: ' + argType)
 
     return result
+
+
+def FindClinics(pos_x, pos_y, min_results, max_result):
+    return 'success'
 
 
 class HelperException(Exception):

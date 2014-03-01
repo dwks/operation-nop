@@ -28,7 +28,8 @@ class ClinicFinderHandler(webapp2.RequestHandler):
         except helper.HelperException as e:
             self.response.out.write('Invalid request - ' + str(e))
             return
-        self.response.out.write('success')
+        result = helper.FindClinics(pos_x, pos_y, min_results, max_result)
+        self.response.out.write(result)
 
 
 web_app = webapp2.WSGIApplication([
@@ -39,7 +40,7 @@ web_app = webapp2.WSGIApplication([
 
 
 def main():
-    httpserver.serve(web_app, host='localhost', port='8080')
+    httpserver.serve(web_app, host='', port='8080')
 
 
 if __name__ == '__main__':
