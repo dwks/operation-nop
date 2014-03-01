@@ -1,5 +1,7 @@
 Requisites:
 
-pip install webapp2
-pip install paste
+Python packages:
+pip install webapp2, paste, webob
 
+Other packages:
+sqlite3
