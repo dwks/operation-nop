@@ -6,10 +6,10 @@ import urllib2
 url='http://localhost:8080/find_clinic'
 
 request = {
-    'pos_x': '1.0',
-    'pos_y': '-1.0',
-    'min_results': '3',
-    'max_results': '100'
+    'pos_x': '3.0',
+    'pos_y': '2.0',
+    'min_results': '2',
+    'max_results': '20'
     }
 
 enc = urllib.urlencode(request)

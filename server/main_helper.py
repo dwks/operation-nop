@@ -4,6 +4,7 @@
 import constants
 import db_helper
 import json
+import operator
 
 
 def ValidateArg(request, name, argType, remarks=None):
@@ -50,7 +51,7 @@ def FindClinics(pos_x, pos_y, min_results, max_result):
     return response
 
 
-def FindCloseClinics(pos_x, pos_y, min_results, max_result):
+def FindCloseClinics(pos_x, pos_y, min_results, max_results):
     # Try issuing queries with increasing block_size until a min number
     # of results are found or we exhaust our tries.
     block_size = constants.INIT_BLOCK_SIZE
@@ -64,10 +65,32 @@ def FindCloseClinics(pos_x, pos_y, min_results, max_result):
             raise HelperException(str(e))
         else:
             if len(rows) >= min_results:
-                return rows
+                break
         block_size = block_size * constants.BLOCK_SIZE_GROW_FACTOR
 
-    return rows
+    return SortByDistance(rows, pos_x, pos_y, max_results)
+
+def SortByDistance(rows, pos_x, pos_y, max_results):
+    dist_map = {}
+    schema_map = db_helper.GetSchemaMap()
+    count = 0
+    for row in rows:
+        x = row[schema_map['POS_X']]
+        y = row[schema_map['POS_Y']]
+        dist = (x - pos_x) * (x - pos_x) + (y - pos_y) * (y - pos_y)
+        dist_map[count] = dist
+        count += 1
+
+    # Sort indices by distance.
+    sorted_by_dist = sorted(dist_map.iteritems(), key=operator.itemgetter(1))
+
+    result = []
+    max_count = min(len(rows), max_results)
+    for i in range(max_count):
+        index = sorted_by_dist.pop(0)[0]
+        result.append(rows[index])
+
+    return result
 
 
 class HelperException(Exception):

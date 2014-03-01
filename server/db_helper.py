@@ -34,7 +34,7 @@ def InsertData(table_name, data):
     header = lines[0]
     lines.pop(0)
 
-    schema_map = _GetSchemaMap()
+    schema_map = GetSchemaMap()
     index_list = _GetIndexList(header, schema_map)
 
     con = sqlite3.connect(DB_NAME)
@@ -108,7 +108,7 @@ def _GetIndexList(header, schema_map):
     return result
 
 
-def _GetSchemaMap():
+def GetSchemaMap():
     result = {}
     parts = COLUMN_FORMAT[1:-1].split(',')
     count = 0
