@@ -114,6 +114,11 @@ def GetStatus(session_id):
     assert user
     username = users.GetUserName(user)
 
+    response = {
+        'status': 7
+        }
+    return json.dumps(response)
+
 
 class HelperException(Exception):
     pass
