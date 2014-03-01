@@ -5,6 +5,7 @@ import constants
 import db_helper
 import json
 import operator
+import random
 import users
 
 
@@ -115,7 +116,7 @@ def GetStatus(session_id):
     username = users.GetUserName(user)
 
     response = {
-        'status': 7
+        'status': random.randint(0, 10)
         }
     return json.dumps(response)
 
