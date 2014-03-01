@@ -6,6 +6,7 @@ import webapp2
 from paste import httpserver
 
 import constants
+import logging
 import main_helper
 
 MAIN_URL = '/main'
@@ -34,9 +35,15 @@ class ClinicFinderHandler(webapp2.RequestHandler):
             self.response.out.write('Invalid request - ' + str(e))
             self.response.status = 400
             return
-        result = main_helper.FindClinics(
-            pos_x, pos_y, constants.BLOCK_SIZE, min_results, max_results)
-        self.response.out.write(result)
+
+        try:
+            result = main_helper.FindClinics(
+                pos_x, pos_y, constants.BLOCK_SIZE, min_results, max_results)
+        except main_helper.HelperException as e:
+            logging.error('Internal error :( - ' + str(e))
+            self.response.status = 500
+        else:
+            self.response.out.write(result)
 
 
 web_app = webapp2.WSGIApplication([
@@ -54,9 +61,12 @@ def main():
     parser.add_option('-p', '--port', default='8080', type='int',
                       help='Port of the server. '
                       'Defaults to %default.')
+    parser.add_option('-v', '--verbose', action='store_true')
     (options, args) = parser.parse_args()
-    httpserver.serve(web_app, host=options.address, port=options.port)
+    if options.verbose:
+        logging.root.setLevel(logging.INFO)
 
+    httpserver.serve(web_app, host=options.address, port=options.port)
 
 if __name__ == '__main__':
     main()

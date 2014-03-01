@@ -13,6 +13,8 @@ request = {
     }
 
 enc = urllib.urlencode(request)
-response = urllib2.urlopen(url, data=enc)
-print response.read()
-
+try:
+    response = urllib2.urlopen(url, data=enc)
+    print response.read()
+except urllib2.HTTPError as e:
+    print 'Server error: ' + str(e)

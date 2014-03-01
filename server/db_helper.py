@@ -1,10 +1,12 @@
 #!/usr/bin/python2.7
 
+import logging
 import sqlite3
 
 
-DB_NAME = '../../../hackathon_data/db/data.db'
+DB_NAME = '../../hackathon_data/db/data.db'
 COLUMN_FORMAT = '(ID INT, TIME TEXT, POS_X REAL, POS_Y REAL, VALUE REAL, MIN REAL, MAX REAL, DESC TEXT, RES0 REAL, RES1 REAL, RES2 TEXT, RES3 TEXT)'
+
 
 def CreateTable(table_name):
     con = sqlite3.connect(DB_NAME)
@@ -133,11 +135,13 @@ def QueryTable(table_name, query_string):
     with con:
         try:
             db_req = 'SELECT * FROM ' + table_name + ' WHERE ' + query_string
+            logging.info('Executing query on table [' + table_name + ']: ' + db_req)
             con.execute(db_req)
         except sqlite3.OperationalError as e:
-            raise DBException('errer executing query [' + db_req + '] - ' + str(e))
+            raise DBException('error executing query - ' + str(e) + ' [' + db_req + ']')
         else:
-            rows = cur.fetchall()
+            rows = con.cursor().fetchall()
+            logging.info('Query returned %d results' % len(rows))
             return rows
 
 
