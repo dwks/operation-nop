@@ -12,9 +12,12 @@ import com.google.android.gms.common.ConnectionResult;
 import android.app.Dialog;
 import android.widget.TextView;
 import android.util.Log;
+import android.os.Handler;
 
 public class MainActivity extends Activity
 {
+    public static final String SERVER = "http://sirius.nss.cs.ubc.ca:8080";
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -57,5 +60,32 @@ public class MainActivity extends Activity
             .bind("max_results", "8")
             .execute();
         */
+
+        setupNotificationQuery();
     }
+
+    private Handler handler = new Handler();
+    private static final int NOTIFICATION_PERIOD = 5*1000;
+
+    private void setupNotificationQuery() {
+        handler.removeCallbacks(requestNotifications);
+        handler.postDelayed(requestNotifications, NOTIFICATION_PERIOD);
+        Log.v("MainActivity", "set up notification timer");
+    }
+
+    private Runnable requestNotifications = new Runnable() {
+        public void run() {
+            new RequestTask(SERVER + "/status", new RequestHandler() {
+                public void onSuccess(String response) {
+                    Log.v("MainActivity", "Got status: " + response);
+                }
+
+                public void onFailure() {
+                    Log.v("MainActivity", "Failed to retrieve status");
+                }
+            }).execute();
+
+            handler.postDelayed(this, NOTIFICATION_PERIOD);
+        }
+    };
 }
