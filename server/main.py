@@ -1,5 +1,6 @@
 #!/usr/bin/python2.7
 
+import optparse
 import webapp2
 
 from paste import httpserver
@@ -40,7 +41,15 @@ web_app = webapp2.WSGIApplication([
 
 
 def main():
-    httpserver.serve(web_app, host='', port='8080')
+    parser = optparse.OptionParser()
+    parser.add_option('-a', '--address', default='localhost',
+                      help='Address of the server. '
+                      'Defaults to %default. ')
+    parser.add_option('-p', '--port', default='8080', type='int',
+                      help='Port of the server. '
+                      'Defaults to %default.')
+    (options, args) = parser.parse_args()
+    httpserver.serve(web_app, host=options.address, port=options.port)
 
 
 if __name__ == '__main__':
