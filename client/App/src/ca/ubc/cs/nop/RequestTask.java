@@ -69,8 +69,9 @@ public class RequestTask extends AsyncTask<Void, Void, Boolean> {
             }
 
             Log.v("RequestTask", "Request completed successfully");
+
             ByteArrayOutputStream responseBody = new ByteArrayOutputStream();
-            responseBody.writeTo(responseBody);
+            response.getEntity().writeTo(responseBody);
             this.response = responseBody.toString();
 
             return true;
@@ -90,14 +91,25 @@ public class RequestTask extends AsyncTask<Void, Void, Boolean> {
             Log.e("RequestTask", "IOException: " + e.getMessage());
             return false;
         }
+
+        finally {
+            Log.v("RequestTask", "End background execution");
+        }
     }
 
     @Override
     protected void onPostExecute(Boolean ok) {
-        if(ok)
-            handler.onSuccess(response);
+        Log.v("RequestTask", "Post-execute: " + (ok? "success: <" + response + ">" : "failure"));
+        Log.v("RequestTask", "Response length: " + response.length());
 
-        else
+        if(ok) {
+            Log.v("RequestTask", "Calling success handler");
+            handler.onSuccess(response);
+        }
+
+        else {
+            Log.v("RequestTask", "Calling failure handler");
             handler.onFailure();
+        }
     }
 }

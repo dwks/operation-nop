@@ -1,8 +1,15 @@
 package ca.ubc.cs.nop;
 
+// generated, do not modify
 import android.app.Activity;
 import android.os.Bundle;
 
+// google play stuff
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.ConnectionResult;
+
+// android stuff
+import android.app.Dialog;
 import android.widget.TextView;
 import android.util.Log;
 
