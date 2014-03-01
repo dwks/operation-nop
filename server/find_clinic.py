@@ -8,8 +8,8 @@ url='http://localhost:8080/find_clinic'
 request = {
     'pos_x': '1.0',
     'pos_y': '-1.0',
-    'min_results': '1',
-    'max_results': '10'
+    'min_results': '3',
+    'max_results': '100'
     }
 
 enc = urllib.urlencode(request)

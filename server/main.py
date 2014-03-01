@@ -5,7 +5,6 @@ import webapp2
 
 from paste import httpserver
 
-import constants
 import logging
 import main_helper
 
@@ -38,7 +37,7 @@ class ClinicFinderHandler(webapp2.RequestHandler):
 
         try:
             result = main_helper.FindClinics(
-                pos_x, pos_y, constants.BLOCK_SIZE, min_results, max_results)
+                pos_x, pos_y, min_results, max_results)
         except main_helper.HelperException as e:
             logging.error('Internal error :( - ' + str(e))
             self.response.status = 500
