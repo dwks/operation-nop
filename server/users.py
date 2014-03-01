@@ -52,7 +52,7 @@ def GetUser(username):
     try:
         rows = db_helper.QueryTable(TABLE_NAME, db_req)
     except db_helper.DBException as e:
-        return False
+        return None
     if len(rows) > 1:
         error = 'Users DB in bad shape - %d users named: ' % len(rows) + username
         logging.error(error)
@@ -61,6 +61,43 @@ def GetUser(username):
         return rows[0]
     
     return None
+
+
+def GetUserBySessionId(session_id):
+    db_req = ("TIME == '" + session_id + "'")
+    try:
+        rows = db_helper.QueryTable(TABLE_NAME, db_req)
+    except db_helper.DBException as e:
+        return None
+    if len(rows) > 1:
+        error = 'Users DB in bad shape - %d users named: ' % len(rows) + username
+        logging.error(error)
+        raise UserException(error)
+    elif len(rows) == 1:
+        return rows[0]
+    
+    return None
+
+
+def GetUserAttrib(user, attrib):
+    schema_map = db_helper.GetSchemaMap()
+    return user[schema_map[attrib]]
+
+
+def GetUserName(user):
+    return GetUserAttrib(user, 'RES2')
+
+
+def GetUserPass(user):
+    return GetUserAttrib(user, 'RES3')
+
+
+def GetUserSessionId(user):
+    return GetUserAttrib(user, 'TIME')
+
+
+def GetUserTableName(user):
+    return TABLE_NAME + '_' + GetUserAttrib(user, 'RES2')
 
 
 class UsersException(Exception):

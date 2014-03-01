@@ -109,5 +109,11 @@ def LoginOrCreateUser(username, password):
     return users.GetUserSessionId(username)
 
 
+def GetStatus(session_id):
+    user = users.GetUserBySessionId(session_id)
+    assert user
+    username = users.GetUserName(user)
+
+
 class HelperException(Exception):
     pass

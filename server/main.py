@@ -11,6 +11,8 @@ import main_helper
 MAIN_URL = '/main'
 CLINIC_FINDER_URL = '/find_clinic'
 LOGIN_URL = '/login'
+STATUS_URL = '/status'
+
 
 class RedirectToMainHandler(webapp2.RequestHandler):
     def get(self):
@@ -67,11 +69,28 @@ class LoginHandler(webapp2.RequestHandler):
             self.response.status = 400
 
 
+class StatusHandler(webapp2.RequestHandler):
+    def post(self):
+        # try:
+        #     session_id = main_helper.ValidateArg(self.request, 'session_id', 'str')
+        # except main_helper.HelperException as e:
+        #     self.response.out.write('Invalid request - ' + str(e))
+        #     self.response.status = 400
+        #     return
+        # HACK:
+        session_id = 'f55c5204-2980-4f3c-ba2e-8a0bbc340d3c'
+
+        response = main_helper.GetStatus(session_id)
+        if response:
+            self.response.out.write(response)    
+
+
 web_app = webapp2.WSGIApplication([
     ('/', RedirectToMainHandler),
     (MAIN_URL, MainHandler),
     (CLINIC_FINDER_URL, ClinicFinderHandler),
     (LOGIN_URL, LoginHandler),
+    (STATUS_URL, StatusHandler),
 ], debug=True)
 
 
