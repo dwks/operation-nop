@@ -128,5 +128,18 @@ def _GetTypeMap():
     return result
 
 
+def QueryTable(table_name, query_string):
+    con = sqlite3.connect(DB_NAME)
+    with con:
+        try:
+            db_req = 'SELECT * FROM ' + table_name + ' WHERE ' + query_string
+            con.execute(db_req)
+        except sqlite3.OperationalError as e:
+            raise DBException('errer executing query [' + db_req + '] - ' + str(e))
+        else:
+            rows = cur.fetchall()
+            return rows
+
+
 class DBException(Exception):
     pass

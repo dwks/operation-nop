@@ -1,6 +1,6 @@
 #!/usr/bin/python2.7
 
-# from db import db_helper
+import db_helper
 
 
 def ValidateArg(request, name, argType, remarks=None):
@@ -31,7 +31,17 @@ def ValidateArg(request, name, argType, remarks=None):
     return result
 
 
-def FindClinics(pos_x, pos_y, min_results, max_result):
+def FindClinics(pos_x, pos_y, block_size, min_results, max_result):
+    db_req = ('POS_X >= %f AND POS_Y <= %f AND POS_Y >= %f AND POS_Y <= %f' % 
+             (pos_x - block_size, pos_x + block_size,
+              pos_y - block_size, pos_y + block_size))
+    # try:
+    #     resp = db_helper.QueryTable('clinics', db_req)
+    # except db_helper.DBException as e:
+    #     raise HelperException(str(e))
+    # return
+    # for line in resp:
+    #     print line
     return 'success'
 
 

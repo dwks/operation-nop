@@ -5,7 +5,8 @@ import webapp2
 
 from paste import httpserver
 
-import helper
+import constants
+import main_helper
 
 MAIN_URL = '/main'
 CLINIC_FINDER_URL = '/find_clinic'
@@ -18,18 +19,23 @@ class RedirectToMainHandler(webapp2.RequestHandler):
 class MainHandler(webapp2.RequestHandler):
     def get(self):
         self.response.write('hello world')
+        self.response.status = 200
 
 class ClinicFinderHandler(webapp2.RequestHandler):
     def post(self):
         try:
-            pos_x = helper.ValidateArg(self.request, 'pos_x', 'float')
-            pos_y = helper.ValidateArg(self.request, 'pos_y', 'float')
-            min_results = helper.ValidateArg(self.request, 'min_results', 'int', 'positive')
-            max_results = helper.ValidateArg(self.request, 'max_results', 'int', 'positive')
-        except helper.HelperException as e:
+            pos_x = main_helper.ValidateArg(self.request, 'pos_x', 'float')
+            pos_y = main_helper.ValidateArg(self.request, 'pos_y', 'float')
+            min_results = main_helper.ValidateArg(
+                self.request, 'min_results', 'int', 'positive')
+            max_results = main_helper.ValidateArg(
+                self.request, 'max_results', 'int', 'positive')
+        except main_helper.HelperException as e:
             self.response.out.write('Invalid request - ' + str(e))
+            self.response.status = 400
             return
-        result = helper.FindClinics(pos_x, pos_y, min_results, max_result)
+        result = main_helper.FindClinics(
+            pos_x, pos_y, constants.BLOCK_SIZE, min_results, max_results)
         self.response.out.write(result)
 
 
