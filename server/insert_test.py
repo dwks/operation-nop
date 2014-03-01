@@ -12,10 +12,10 @@ if len(sys.argv) > 1:
     data = file_p.read()
     file_p.close()
 else:
-    data = 'POS_X|POS_Y\n111|112\n222|222\n333|332\n444|442'
+    data = 'POS_X|POS_Y\n1|1\n10|10'
 
 request = {
-    'table_name': 'temperature',
+    'table_name': 'clinics',
     'data': data
     }
 

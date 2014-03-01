@@ -51,7 +51,7 @@ def InsertData(table_name, data):
 
 
 def _FormatLine(line, index_list):
-    type_map = _GetTypeMap()
+    type_map = GetTypeMap()
     parts = line.split('|')
     if len(parts) != len(index_list):
         raise DBException('Invalid data line: [' + line + ']')
@@ -119,7 +119,7 @@ def _GetSchemaMap():
     return result
 
 
-def _GetTypeMap():
+def GetTypeMap():
     result = {}
     parts = COLUMN_FORMAT[1:-1].split(',')
     count = 0
@@ -130,17 +130,29 @@ def _GetTypeMap():
     return result
 
 
+def GetNameMap():
+    result = {}
+    parts = COLUMN_FORMAT[1:-1].split(',')
+    count = 0
+    for part in parts:
+        result[count] = part.split()[0]
+        count += 1
+
+    return result
+
+
 def QueryTable(table_name, query_string):
     con = sqlite3.connect(DB_NAME)
     with con:
         try:
+            cur = con.cursor()
             db_req = 'SELECT * FROM ' + table_name + ' WHERE ' + query_string
             logging.info('Executing query on table [' + table_name + ']: ' + db_req)
-            con.execute(db_req)
+            cur.execute(db_req)
         except sqlite3.OperationalError as e:
             raise DBException('error executing query - ' + str(e) + ' [' + db_req + ']')
         else:
-            rows = con.cursor().fetchall()
+            rows = cur.fetchall()
             logging.info('Query returned %d results' % len(rows))
             return rows
 

@@ -1,6 +1,7 @@
 #!/usr/bin/python2.7
 
 import db_helper
+import json
 
 
 def ValidateArg(request, name, argType, remarks=None):
@@ -32,18 +33,27 @@ def ValidateArg(request, name, argType, remarks=None):
 
 
 def FindClinics(pos_x, pos_y, block_size, min_results, max_result):
-    db_req = ('POS_X >= %f AND POS_Y <= %f AND POS_Y >= %f AND POS_Y <= %f' % 
+    db_req = ('POS_X >= %f AND POS_X <= %f AND POS_Y >= %f AND POS_Y <= %f' % 
              (pos_x - block_size, pos_x + block_size,
               pos_y - block_size, pos_y + block_size))
     try:
-        resp = db_helper.QueryTable('clinics', db_req)
+        rows = db_helper.QueryTable('clinics', db_req)
     except db_helper.DBException as e:
         raise HelperException(str(e))
         return
 
-    for line in resp:
-        print line
-    return 'success'
+    result = []
+    type_map = db_helper.GetNameMap()
+    for row in rows:
+        assert len(row) == len(type_map)
+        resp = {}
+        for i in range(len(row)):
+            if row[i]:
+                resp[type_map[i]] = row[i]
+        result.append(resp)
+
+    response = json.dumps(result)
+    return response
 
 
 class HelperException(Exception):
