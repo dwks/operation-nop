@@ -1,10 +1,12 @@
 #!/usr/bin/python2.7
 
+import logging
 import sqlite3
 
 
-DB_NAME = '../../../hackathon_data/db/data.db'
+DB_NAME = '../../hackathon_data/db/data.db'
 COLUMN_FORMAT = '(ID INT, TIME TEXT, POS_X REAL, POS_Y REAL, VALUE REAL, MIN REAL, MAX REAL, DESC TEXT, RES0 REAL, RES1 REAL, RES2 TEXT, RES3 TEXT)'
+
 
 def CreateTable(table_name):
     con = sqlite3.connect(DB_NAME)
@@ -32,7 +34,7 @@ def InsertData(table_name, data):
     header = lines[0]
     lines.pop(0)
 
-    schema_map = _GetSchemaMap()
+    schema_map = GetSchemaMap()
     index_list = _GetIndexList(header, schema_map)
 
     con = sqlite3.connect(DB_NAME)
@@ -49,7 +51,7 @@ def InsertData(table_name, data):
 
 
 def _FormatLine(line, index_list):
-    type_map = _GetTypeMap()
+    type_map = GetTypeMap()
     parts = line.split('|')
     if len(parts) != len(index_list):
         raise DBException('Invalid data line: [' + line + ']')
@@ -106,7 +108,7 @@ def _GetIndexList(header, schema_map):
     return result
 
 
-def _GetSchemaMap():
+def GetSchemaMap():
     result = {}
     parts = COLUMN_FORMAT[1:-1].split(',')
     count = 0
@@ -117,7 +119,7 @@ def _GetSchemaMap():
     return result
 
 
-def _GetTypeMap():
+def GetTypeMap():
     result = {}
     parts = COLUMN_FORMAT[1:-1].split(',')
     count = 0
@@ -128,16 +130,30 @@ def _GetTypeMap():
     return result
 
 
+def GetNameMap():
+    result = {}
+    parts = COLUMN_FORMAT[1:-1].split(',')
+    count = 0
+    for part in parts:
+        result[count] = part.split()[0]
+        count += 1
+
+    return result
+
+
 def QueryTable(table_name, query_string):
     con = sqlite3.connect(DB_NAME)
     with con:
         try:
+            cur = con.cursor()
             db_req = 'SELECT * FROM ' + table_name + ' WHERE ' + query_string
-            con.execute(db_req)
+            logging.info('Executing query on table [' + table_name + ']: ' + db_req)
+            cur.execute(db_req)
         except sqlite3.OperationalError as e:
-            raise DBException('errer executing query [' + db_req + '] - ' + str(e))
+            raise DBException('error executing query - ' + str(e) + ' [' + db_req + ']')
         else:
             rows = cur.fetchall()
+            logging.info('Query returned %d results' % len(rows))
             return rows
 
 

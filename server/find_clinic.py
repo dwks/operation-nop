@@ -6,13 +6,15 @@ import urllib2
 url='http://localhost:8080/find_clinic'
 
 request = {
-    'pos_x': '1.0',
-    'pos_y': '-1.0',
-    'min_results': '1',
-    'max_results': '10'
+    'pos_x': '3.0',
+    'pos_y': '2.0',
+    'min_results': '2',
+    'max_results': '20'
     }
 
 enc = urllib.urlencode(request)
-response = urllib2.urlopen(url, data=enc)
-print response.read()
-
+try:
+    response = urllib2.urlopen(url, data=enc)
+    print response.read()
+except urllib2.HTTPError as e:
+    print 'Server error: ' + str(e)

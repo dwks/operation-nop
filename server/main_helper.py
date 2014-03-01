@@ -1,6 +1,10 @@
 #!/usr/bin/python2.7
 
+
+import constants
 import db_helper
+import json
+import operator
 
 
 def ValidateArg(request, name, argType, remarks=None):
@@ -31,18 +35,62 @@ def ValidateArg(request, name, argType, remarks=None):
     return result
 
 
-def FindClinics(pos_x, pos_y, block_size, min_results, max_result):
-    db_req = ('POS_X >= %f AND POS_Y <= %f AND POS_Y >= %f AND POS_Y <= %f' % 
-             (pos_x - block_size, pos_x + block_size,
-              pos_y - block_size, pos_y + block_size))
-    # try:
-    #     resp = db_helper.QueryTable('clinics', db_req)
-    # except db_helper.DBException as e:
-    #     raise HelperException(str(e))
-    # return
-    # for line in resp:
-    #     print line
-    return 'success'
+def FindClinics(pos_x, pos_y, min_results, max_result):
+    rows = FindCloseClinics(pos_x, pos_y, min_results, max_result)
+    result = []
+    type_map = db_helper.GetNameMap()
+    for row in rows:
+        assert len(row) == len(type_map)
+        resp = {}
+        for i in range(len(row)):
+            if row[i]:
+                resp[type_map[i]] = row[i]
+        result.append(resp)
+
+    response = json.dumps(result)
+    return response
+
+
+def FindCloseClinics(pos_x, pos_y, min_results, max_results):
+    # Try issuing queries with increasing block_size until a min number
+    # of results are found or we exhaust our tries.
+    block_size = constants.INIT_BLOCK_SIZE
+    for _ in range(constants.MAX_POS_QUERY_RETRIES):
+        db_req = ('POS_X >= %f AND POS_X <= %f AND POS_Y >= %f AND POS_Y <= %f' % 
+                  (pos_x - block_size, pos_x + block_size,
+                   pos_y - block_size, pos_y + block_size))
+        try:
+            rows = db_helper.QueryTable('clinics', db_req)
+        except db_helper.DBException as e:
+            raise HelperException(str(e))
+        else:
+            if len(rows) >= min_results:
+                break
+        block_size = block_size * constants.BLOCK_SIZE_GROW_FACTOR
+
+    return SortByDistance(rows, pos_x, pos_y, max_results)
+
+def SortByDistance(rows, pos_x, pos_y, max_results):
+    dist_map = {}
+    schema_map = db_helper.GetSchemaMap()
+    count = 0
+    for row in rows:
+        x = row[schema_map['POS_X']]
+        y = row[schema_map['POS_Y']]
+        dist = (x - pos_x) * (x - pos_x) + (y - pos_y) * (y - pos_y)
+        dist_map[count] = dist
+        count += 1
+
+    # Sort indices by distance.
+    sorted_by_dist = sorted(dist_map.iteritems(), key=operator.itemgetter(1))
+
+    result = []
+    max_count = min(len(rows), max_results)
+    for i in range(max_count):
+        index = sorted_by_dist.pop(0)[0]
+        result.append(rows[index])
+
+    return result
 
 
 class HelperException(Exception):
