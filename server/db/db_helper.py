@@ -3,8 +3,8 @@
 import sqlite3
 
 
-DB_NAME = 'test.db'
-COLUMN_FORMAT = '(Id INT, TIME TEXT, POS_X REAL, POS_Y REAL, VALUE REAL, MIN REAL, MAX REAL, DESC TEXT, RES0 REAL, RES1 REAL, RES2 TEXT, RES3 TEXT)'
+DB_NAME = '../../../hackathon_data/db/data.db'
+COLUMN_FORMAT = '(ID INT, TIME TEXT, POS_X REAL, POS_Y REAL, VALUE REAL, MIN REAL, MAX REAL, DESC TEXT, RES0 REAL, RES1 REAL, RES2 TEXT, RES3 TEXT)'
 
 def CreateTable(table_name):
     con = sqlite3.connect(DB_NAME)
@@ -38,18 +38,21 @@ def InsertData(table_name, data):
     con = sqlite3.connect(DB_NAME)
     with con:
         for line in lines:
+            if not line:
+                continue
             fmt_line = _FormatLine(line, index_list)
             try:
-                con.execute('INSERT INTO ' + table_name + ' VALUES(' + fmt_line + ')')
+                db_req = 'INSERT INTO ' + table_name + ' VALUES(' + fmt_line + ')'
+                con.execute(db_req)
             except sqlite3.OperationalError as e:
-                raise DBException(str(e))
+                raise DBException('data insert error - ' + str(e) + ' on line: ' + db_req)
 
 
 def _FormatLine(line, index_list):
     type_map = _GetTypeMap()
     parts = line.split('|')
     if len(parts) != len(index_list):
-        raise DBException('Invalid data line: ' + line)
+        raise DBException('Invalid data line: [' + line + ']')
 
     result = {}
     for i in range(len(type_map.keys())):
@@ -57,7 +60,7 @@ def _FormatLine(line, index_list):
 
     for index in index_list:
         value = parts.pop(0)
-        result[index] = value
+        result[index] = _GetFormattedValue(value, type_map[index])
     
     for i in range(len(type_map.keys())):
         if result[i] == None:
@@ -71,16 +74,25 @@ def _FormatLine(line, index_list):
     return fmt_result[:-2]
 
 
-def _GetDefaultValue(typeName):
-    if typeName == 'INT':
+def _GetDefaultValue(type_name):
+    if type_name == 'INT':
         return 'NULL'
-    elif typeName == 'TEXT':
+    elif type_name == 'TEXT':
         return 'NULL'
-    elif typeName == 'REAL':
+    elif type_name == 'REAL':
         return 'NULL'
     
-    raise DBException('Invalid data type:' + typeName)
+    raise DBException('Invalid data type:' + type_name)
 
+def _GetFormattedValue(value, type_name):
+    if type_name == 'INT':
+        return value
+    elif type_name == 'TEXT':
+        return "'" + value + "'"
+    elif type_name == 'REAL':
+        return value
+    
+    raise DBException('Invalid data type:' + type_name)
 
 def _GetIndexList(header, schema_map):
     result = []
