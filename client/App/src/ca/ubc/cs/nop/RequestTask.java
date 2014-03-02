@@ -45,6 +45,12 @@ public class RequestTask extends AsyncTask<Void, Void, Boolean> {
         return this;
     }
 
+    // converts @a value from int to String
+    public RequestTask bind(String name, int value) {
+        parameters.add(new BasicNameValuePair(name, Integer.toString(value)));
+        return this;
+    }
+
     @Override
     protected Boolean doInBackground(Void... args) {
         Log.v("RequestTask", "Begin background execution");
