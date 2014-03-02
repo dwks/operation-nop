@@ -173,7 +173,7 @@ def GetStatus(session_id, pos_x, pos_y):
 
     if sample_count:
         response['air_quality'] = air_quality / sample_count
-        logging.info('Air quality: ' + str(response['air_quality']))
+        logging.debug('Air quality: ' + str(response['air_quality']))
 
     # Try get flu info.
     flu_people, flu_hospitals, flu_work_places = GetFluInfo()
