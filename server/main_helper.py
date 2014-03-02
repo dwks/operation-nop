@@ -156,7 +156,6 @@ def GetStatus(session_id, pos_x, pos_y):
 
     # Try get air info.
     air_quality_site = GetAirQualitySite(pos_x, pos_y)
-    print air_quality_site
     schema_map = db_helper.GetSchemaMap()
     air_quality = web_helper.GetAirQuality(
         air_quality_site[0][schema_map['RES2']])
