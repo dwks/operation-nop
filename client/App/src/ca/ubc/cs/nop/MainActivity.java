@@ -191,6 +191,12 @@ public class MainActivity extends Activity {
         unbindService(locationServiceConnection);
     }
 
+    @Override
+    public void onDestroy() {
+      super.onDestroy();
+      gameView.stopThread();
+    }
+  
     // button callbacks
     public void showMap(View view) {
         getFragmentManager().beginTransaction()
