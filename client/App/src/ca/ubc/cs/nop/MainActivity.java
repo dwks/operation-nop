@@ -11,6 +11,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.CameraUpdateFactory;
 
 // json stuff
 import org.json.JSONObject;
@@ -241,6 +242,9 @@ public class MainActivity extends Activity {
             .bind("min_results", "1")
             .bind("max_results", "1")
             .execute();
+
+        // go to us
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 10));
     }
 
     public void showMain(View view) {
