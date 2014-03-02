@@ -12,9 +12,12 @@ public class NopObject {
   Rect rect_;
   int tickCounter_;
   int frame_;
-  public NopObject(int dropOffset, boolean alive, int seed) {
+  int id_;
+  int aliveCounter_;
+  public NopObject(int id, int dropOffset, boolean alive, int seed) {
     dropOffset_ = dropOffset;
     alive_ = alive;
+    id_ = id;
 
     rect_ = new Rect();
     setSize(0, 0, 0, 0);
@@ -30,6 +33,8 @@ public class NopObject {
   public void draw(Canvas canvas, Paint paint,
                    Bitmap alive0, Bitmap alive1,
                    Bitmap dead0, Bitmap dead1) {
+    evaluateAlive();
+    
     if (alive_) {
       if (frame_ == 0) {
         canvas.drawBitmap(alive0, null, rect_, paint);
@@ -45,13 +50,24 @@ public class NopObject {
     }
 
     tickCounter_++;
+    int timeout;
     if (frame_ == 0) {
-      if (tickCounter_ > 40) {
+      if (alive_) {
+        timeout = 50;
+      } else{
+        timeout = 15;
+      }
+      if (tickCounter_ > timeout) {
         frame_ = 1;
         tickCounter_ = 0;
       }
     } else {
-      if (tickCounter_ > 5) {
+      if (alive_) {
+        timeout = 5;
+      } else{
+        timeout = 15;
+      }
+      if (tickCounter_ > timeout) {
         frame_ = 0;
         tickCounter_ = 0;
       }
@@ -63,5 +79,22 @@ public class NopObject {
     rect_.right = x + width / 2;
     rect_.top = y - height / 2;
     rect_.bottom = y + height / 2;
+
+    if (!alive_) {
+      rect_.top += dropOffset_;
+      rect_.bottom += dropOffset_;
+    }
+  }
+
+  void evaluateAlive() {
+    aliveCounter_--;
+    if (aliveCounter_ <= 0) {
+      if (Globals.status >= id_ * 2.0) {
+        alive_ = true;
+      } else {
+        alive_ = false;
+      }
+      aliveCounter_ = 40;
+    }
   }
 }
