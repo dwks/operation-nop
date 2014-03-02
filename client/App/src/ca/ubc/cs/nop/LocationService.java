@@ -44,6 +44,7 @@ public class LocationService extends Service
     // location services
     private LocationClient client;
     private boolean connected = false;
+    private Location lastKnownLocation = new Location("");
 
     @Override
     public void onConnected(Bundle dataBundle) {
@@ -60,6 +61,7 @@ public class LocationService extends Service
     @Override
     public void onConnectionFailed(ConnectionResult result) {
         Log.v("LocationService", "Failed to connect to location service");
+        connected = false;
     }
 
     public boolean isAvailable() {
@@ -68,7 +70,17 @@ public class LocationService extends Service
     }
 
     public Location getLocation() {
-        return client.getLastLocation();
+        try {
+            if(connected)
+                lastKnownLocation = client.getLastLocation();
+        }
+
+        catch(IllegalStateException e) {
+            // WHAT IS EVEN CAUSING THIS
+            Log.v("LocationService", "IllegalStateException: " + e.getMessage());
+        }
+
+        return lastKnownLocation;
     }
 
     // service lifecycle
