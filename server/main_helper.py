@@ -142,9 +142,9 @@ def GetStatus(session_id, pos_x, pos_y):
     assert user
     username = users.GetUserName(user)
 
-    response = {
-        'status': random.randint(0, 10)
-        }
+    status_sample_count = 0
+    status_value = 0
+    response = {}
 
     # Try get location info.
     city, country, street, number = web_helper.GetCityName(pos_x, pos_y)
@@ -174,18 +174,34 @@ def GetStatus(session_id, pos_x, pos_y):
     if sample_count:
         response['air_quality'] = air_quality / sample_count
         logging.debug('Air quality: ' + str(response['air_quality']))
+        status_value += response['air_quality']
+        status_sample_count += 1
 
     # Try get flu info.
     flu_people, flu_hospitals, flu_work_places = GetFluInfo()
 
     if flu_people:
         response['flu_people'] = flu_people
-        
+        status_value += response['flu_people'][0]
+        status_value += response['flu_people'][1]
+        status_sample_count += 2
+
     if flu_hospitals:
         response['flu_hospitals'] = flu_hospitals
+        status_value += response['flu_hospitals'][0]
+        status_value += response['flu_hospitals'][1]
+        status_sample_count += 2
 
     if flu_work_places:
         response['flu_work_places'] = flu_work_places
+        status_value += response['flu_work_places'][0]
+        status_value += response['flu_work_places'][1]
+        status_sample_count += 2
+
+    if status_sample_count:
+        status_value /= status_sample_count
+
+    response['status'] = status_value
 
     return json.dumps(response)
 
