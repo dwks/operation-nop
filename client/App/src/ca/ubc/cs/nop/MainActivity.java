@@ -8,9 +8,12 @@ import com.google.android.gms.common.GooglePlayServicesClient;
 // google maps stuff
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.LatLng;
 
 // json stuff
 import org.json.JSONObject;
+import org.json.JSONArray;
 import org.json.JSONException;
 
 // android stuff
@@ -200,6 +203,43 @@ public class MainActivity extends Activity {
         map = mapFragment.getMap();
         map.setMyLocationEnabled(true);
         gameView.setVisibility(View.GONE);
+
+        // find clinic and place marker
+        if(!locationService.isAvailable())
+            return;
+
+        Location location = locationService.getLocation();
+
+        new RequestTask(Globals.SERVER + "/find_clinic", new RequestHandler() {
+            public void onSuccess(String response) {
+                Log.v("MainActivity", "Hospital request succeeded");
+
+                try {
+                    JSONArray list = new JSONArray(response);
+                    JSONObject data = list.getJSONObject(0);
+                    double lng = data.getDouble("POS_X");
+                    double lat = data.getDouble("POS_Y");
+                    String name = data.getString("DESC");
+
+                    map.addMarker(new MarkerOptions()
+                        .position(new LatLng(lat, lng))
+                        .title(name));
+                }
+
+                catch(JSONException e) {
+                    Log.v("MainActivity", "Hospital request returned invalid JSON");
+                }
+            }
+
+            public void onFailure() {
+                Log.v("MainActivity", "Hospital request failed");
+            }
+        })
+            .bind("pos_x", String.valueOf(location.getLongitude()))
+            .bind("pos_y", String.valueOf(location.getLatitude()))
+            .bind("min_results", "1")
+            .bind("max_results", "1")
+            .execute();
     }
 
     public void showMain(View view) {
