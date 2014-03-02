@@ -55,6 +55,19 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
+        /*
+        ImageView firstBird = (ImageView)findViewById(R.id.birdOne);
+        ImageView secondBird = (ImageView)findViewById(R.id.birdTwo);
+        ImageView thirdBird = (ImageView)findViewById(R.id.birdThree);
+        ImageView fourthBird = (ImageView)findViewById(R.id.birdFour);
+        ImageView fifthBird = (ImageView)findViewById(R.id.birdFive);
+        setupAnimations(firstBird);
+        setupAnimations(secondBird);
+        setupAnimations(thirdBird);
+        setupAnimations(fourthBird);
+        setupAnimations(fifthBird);
+        */
+
         // check for google play services (required by location services and maps api)
         Log.v("MainActivity", "Checking for Google Play Services");
         int gplayStatus = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext());
@@ -147,6 +160,7 @@ public class MainActivity extends Activity {
         placeholder1.setVisibility(View.GONE);
     }
 
+    /*
     public void test(View view) {
         if(!locationService.isAvailable()) {
             Toast.makeText(getApplicationContext(), "Location services unavailable", Toast.LENGTH_SHORT).show();
@@ -156,4 +170,11 @@ public class MainActivity extends Activity {
         Location location = locationService.getLocation();
         Toast.makeText(getApplicationContext(), "Current location: " + Location.convert(location.getLongitude(), Location.FORMAT_DEGREES) + "/" + Location.convert(location.getLatitude(), Location.FORMAT_DEGREES), Toast.LENGTH_SHORT).show();
     }
+
+    private void setupAnimations(ImageView firstBird) {
+        firstBird.setBackgroundResource(R.drawable.bird);
+        AnimationDrawable birdAnimation = (AnimationDrawable) firstBird.getBackground();
+        birdAnimation.start();
+    }
+    */
 }

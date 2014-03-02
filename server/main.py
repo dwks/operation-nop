@@ -80,8 +80,10 @@ class StatusHandler(webapp2.RequestHandler):
             self.response.status = 400
             return
 
+        logging.info('Recv status request from: ' + self.request.remote_addr)
         response = main_helper.GetStatus(session_id, pos_x, pos_y)
         if response:
+            logging.info('Response to status: ' + str(response))
             self.response.out.write(response)    
 
 

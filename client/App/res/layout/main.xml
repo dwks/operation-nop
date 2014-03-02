@@ -40,4 +40,46 @@
         android:onClick="showNotifications"
         android:layout_weight="1" />
   </LinearLayout>
+
+    <!-- Branch: -->
+    <!--
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/branch"
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        >
+            <ImageView
+                android:layout_weight="1"
+                android:id="@+id/birdOne"
+                android:layout_width="0dp"
+                android:layout_height="50px"
+            />
+            <ImageView
+                android:layout_weight="1"
+                android:id="@+id/birdTwo"
+                android:layout_width="0dp"
+                android:layout_height="50px"
+            />
+            <ImageView
+                android:layout_weight="1"
+                android:id="@+id/birdThree"
+                android:layout_width="0dp"
+                android:layout_height="50px"
+            />
+            <ImageView
+                android:layout_weight="1"
+                android:id="@+id/birdFour"
+                android:layout_width="0dp"
+                android:layout_height="50px"
+            />
+            <ImageView
+                android:layout_weight="1"
+                android:id="@+id/birdFive"
+                android:layout_width="0dp"
+                android:layout_height="50px"
+            />
+    </LinearLayout>
+    -->
 </LinearLayout>

@@ -147,13 +147,13 @@ def QueryTable(table_name, query_string):
         try:
             cur = con.cursor()
             db_req = 'SELECT * FROM ' + table_name + ' WHERE ' + query_string
-            logging.info('Executing query on table [' + table_name + ']: ' + db_req)
+            logging.debug('Executing query on table [' + table_name + ']: ' + db_req)
             cur.execute(db_req)
         except sqlite3.OperationalError as e:
             raise DBException('error executing query - ' + str(e) + ' [' + db_req + ']')
         else:
             rows = cur.fetchall()
-            logging.info('Query returned %d results' % len(rows))
+            logging.debug('Query returned %d results' % len(rows))
             return rows
 
 

@@ -2,6 +2,8 @@
 
 import json
 import logging
+import os
+import subprocess
 import urllib
 import urllib2
 
@@ -45,7 +47,7 @@ def GetCityName(pos_x, pos_y):
 
 def SendRequest(url, request=None):
     try:
-        if request:
+        if request != None:
             enc = urllib.urlencode(request)
             response = urllib2.urlopen(url, data=enc)
         else:
@@ -57,23 +59,16 @@ def SendRequest(url, request=None):
 
 
 def GetAirQuality(air_quality_site):
-    resp = SendRequest(air_quality_site + 'm')
-    if not resp:
-        logging.error('Failed to get air quality info from: ' + air_quality_site)
+    command = ['perl', 'aqicn.pl', air_quality_site + 'm/']
+    try:
+        air_quality_str = subprocess.check_output(command, stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as e:
+        logging.error('Executing aqicn.pl failed: ' + e.output)
+        return None
+    except OSError as e:
+        logging.error('Executing aqicn.pl failed: ' + str(e))
         return None
 
-    start = resp.find('saqi item')
-    if start == -1:
-        logging.error('Failed to find saqi_item in: ' + air_quality_site)
-        return None
-
-    resp = resp[start:]
-    start = resp.find('>')
-    if start == -1:
-        logging.error('Failed to find > in' + air_quality_site)
-        return None  
-
-    air_quality_str = resp[start + 1:resp.find('<')]
     try:
         air_quality = float(air_quality_str)
     except ValueError:

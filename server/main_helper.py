@@ -2,12 +2,16 @@
 
 
 import constants
+import datetime
 import db_helper
 import json
+import logging
 import operator
 import random
 import users
 import web_helper
+
+UNKNOWN_THREE = (None, None, None)
 
 
 def ValidateArg(request, name, arg_type, remarks=None):
@@ -138,9 +142,9 @@ def GetStatus(session_id, pos_x, pos_y):
     assert user
     username = users.GetUserName(user)
 
-    response = {
-        'status': random.randint(0, 10)
-        }
+    status_sample_count = 0
+    status_value = 0
+    response = {}
 
     # Try get location info.
     city, country, street, number = web_helper.GetCityName(pos_x, pos_y)
@@ -155,22 +159,102 @@ def GetStatus(session_id, pos_x, pos_y):
         response['number'] = number
 
     # Try get air info.
-    air_quality_site = GetAirQualitySite(pos_x, pos_y)
+    air_quality_sites = GetAirQualitySite(pos_x, pos_y)
     schema_map = db_helper.GetSchemaMap()
-    air_quality = web_helper.GetAirQuality(
-        air_quality_site[0][schema_map['RES2']])
 
-    if air_quality:
-        response['air_quality'] = air_quality
+    air_quality = 0
+    sample_count = 0
+    for air_quality_site in air_quality_sites:
+        sample = web_helper.GetAirQuality(
+            air_quality_site[schema_map['RES2']])
+        if sample:
+            air_quality += sample
+            sample_count += 1.0
+
+    if sample_count:
+        response['air_quality'] = air_quality / sample_count
+        logging.debug('Air quality: ' + str(response['air_quality']))
+        status_value += response['air_quality']
+        status_sample_count += 1
+
+    # Try get flu info.
+    flu_people, flu_hospitals, flu_work_places = GetFluInfo()
+
+    if flu_people:
+        response['flu_people'] = flu_people
+        status_value += response['flu_people'][0]
+        status_value += response['flu_people'][1]
+        status_sample_count += 2
+
+    if flu_hospitals:
+        response['flu_hospitals'] = flu_hospitals
+        status_value += response['flu_hospitals'][0]
+        status_value += response['flu_hospitals'][1]
+        status_sample_count += 2
+
+    if flu_work_places:
+        response['flu_work_places'] = flu_work_places
+        status_value += response['flu_work_places'][0]
+        status_value += response['flu_work_places'][1]
+        status_sample_count += 2
+
+    if status_sample_count:
+        status_value /= status_sample_count
+
+    response['status'] = status_value
 
     return json.dumps(response)
 
 
 def GetAirQualitySite(pos_x, pos_y):
     result = FindClosest(
-        'air_quality_sites', pos_y, pos_x, 1, 1, 0.2, 5, 5)
+        'air_quality_sites', pos_y, pos_x, 1, 2, 0.2, 5, 5)
     assert result
     return result
+
+def GetFluInfo():
+    # For flu info:
+    # RES0: week number in the year
+    # VALUE: value of data
+    # MIN: min value diff in year
+    # MAX: max value diff in year
+    # RES1: max value in year
+    schema_map = db_helper.GetSchemaMap()
+
+    date = datetime.datetime.now()
+    week_num = date.isocalendar()[1]
+    last_week_num = (week_num + 51) % 52
+
+    response = []
+    week_nums = [week_num, last_week_num]
+    db_names = ['flu_sick_people', 'flu_sick_hospitals', 'flu_sick_work_places']
+    for db_name in db_names:
+        week_data = []
+        for week in week_nums:
+            db_req = 'RES0 = ' + str(week)
+            rows = db_helper.QueryTable(db_name, db_req)
+            if not len(rows) == 1:
+                logging.error(db_name + ' DB in bad state - returned %d for week ' % len(rows) + str(week))
+                return UNKNOWN_THREE
+
+            value = rows[0][schema_map['VALUE']]
+            week_data.append(value)
+            max_value = float(rows[0][schema_map['RES1']])
+            min_diff = rows[0][schema_map['MIN']]
+            max_diff = rows[0][schema_map['MAX']]
+            week_maxes = (max_value, min_diff, max_diff)
+
+        week_quality = 10 * (1 - week_data[0] / week_maxes[0])
+        week_percent = 100 * ((week_data[0] / week_data[1]) - 1)
+
+        week_diff = week_data[0] - week_data[1]
+        week_diff_quality = 10 * (week_maxes[2] - week_diff) / (week_maxes[2] - week_maxes[1]) 
+
+        response.append((week_quality, week_diff_quality, week_percent))
+
+    return response
+
+
 
 class HelperException(Exception):
     pass
