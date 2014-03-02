@@ -73,23 +73,20 @@ public MainGamePanel(Context context) {
 @Override
 protected void onDraw(Canvas canvas) {
 //This is where we draw stuff..  since this is just a skeleton demo, we only draw the color Dark Grey so we can visibly see that we actually accomplished something with the surfaceview drawing
-        if (canvas == null) {
-            // gameThread.setRunning(false); // Stop the Thread from running because the surface was destroyed.  Can't play a game with no surface!!  
-            return;
-        }
     if (canvas == null) {
-        gameThread.setRunning(false); // Stop the Thread from running because the surface was destroyed.  Can't play a game with no surface!!  
+        //gameThread.setRunning(false); // Stop the Thread from running because the surface was destroyed.  Can't play a game with no surface!!  
         return;
     }
     Log.d("MainActivitiy", "Inside onDraw"); 
 
     // This is where all the bird animation stuff is drawn...
 
-    canvas.drawColor(0xb8c7cf); // background colour
+//    canvas.drawColor(0xb8c7cf); // background colour
+    canvas.drawColor(Color.RED); // background colour
 
-//    branchImg.setHeight(50);
-//    branchImg.setWidth(50);
-//    canvas.drawBitmap(branchImg, 5, 5, null);
+//    branchImg.setHeight( canvas.getHeight() );
+//    branchImg.setWidth( canvas.getWidth() );
+//    canvas.drawBitmap(branchImg, 0, 5, null);
 
 }
 
