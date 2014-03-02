@@ -14,12 +14,13 @@ final static public String tag = "Tracer";
 private GameThread gameThread;  // For our thread needed to do logical processing without holding up the UI thread
 private SurfaceHolder holder; // For our CallBacks.. (One of the areas I don't understand!)
 
+boolean startCalled;
 public MainGamePanel(Context context) {
     super(context);
     Log.d(tag, "Inside MainGamePanel");
     gameThread = new GameThread(this); //Create the GameThread instance for our logical processing
     holder = getHolder();
-
+    startCalled = false;
 
     holder.addCallback(new SurfaceHolder.Callback() {
 
@@ -29,8 +30,11 @@ public MainGamePanel(Context context) {
         public void surfaceDestroyed(SurfaceHolder holder) {
             boolean retry = true;
             Log.d(tag, "Inside SurfaceHolder Callback - surfaceDestroyed");
-            gameThread.setRunning(false); // Stop the Thread from running because the surface was destroyed.  Can't play a game with no surface!!  
-
+/*            if (startCalled) {
+                startCalled = false;
+                gameThread.setRunning(false); // Stop the Thread from running because the surface was destroyed.  Can't play a game with no surface!!  
+            }
+*/
             while (retry) { 
                 try {
                     Log.d(tag, "Inside SurfaceHolder Callback - surfaceDestroyed - while statement");
@@ -47,9 +51,12 @@ public MainGamePanel(Context context) {
         public void surfaceCreated(SurfaceHolder holder) {
             // let there be Surface!
             Log.d(tag, "Inside SurfaceHolder Callback - surfaceCreated");
-            gameThread.setRunning(true); // Now we start the thread
-            gameThread.start(); // and begin our game's logical processing
 
+            if (!startCalled) {
+                startCalled = true;
+                gameThread.setRunning(true); // Now we start the thread
+                gameThread.start(); // and begin our game's logical processing
+            }
         }
 
         @Override
@@ -64,6 +71,10 @@ public MainGamePanel(Context context) {
 @Override
 protected void onDraw(Canvas canvas) {
 //This is where we draw stuff..  since this is just a skeleton demo, we only draw the color Dark Grey so we can visibly see that we actually accomplished something with the surfaceview drawing
+        if (canvas == null) {
+            gameThread.setRunning(false); // Stop the Thread from running because the surface was destroyed.  Can't play a game with no surface!!  
+            return;
+        }
     Log.d("MainActivitiy", "Inside onDraw"); 
     canvas.drawColor(Color.RED); // You can change the Color to whatever color you want, for this demo I just used Color.DKGRAY 
 

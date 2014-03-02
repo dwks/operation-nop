@@ -1,18 +1,28 @@
 package ca.ubc.cs.nop;
 
-// generated, do not modify
-import android.app.Activity;
-import android.os.Bundle;
-
-// google play stuff
+// google play services stuff
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient;
+
+// google maps stuff
+import com.google.android.gms.maps.MapFragment;
 
 // android stuff
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.content.ComponentName;
+import android.os.Bundle;
+import android.os.IBinder;
 import android.app.Dialog;
-import android.widget.TextView;
+import android.view.View;
 import android.util.Log;
-import android.os.Handler;
+import android.location.Location;
+import android.widget.Toast;
+import android.widget.Button;
+import android.widget.RelativeLayout;
 
 // animation stuff
 import android.graphics.drawable.*;
@@ -21,47 +31,39 @@ import android.view.*;
 import android.graphics.*;
 import android.content.*;
 
-public class MainActivity extends Activity
-{
-    public static final String SERVER = "http://sirius.nss.cs.ubc.ca:8080";
-    public static final String SESSION_ID
-        = "f55c5204-2980-4f3c-ba2e-8a0bbc340d3c";
+public class MainActivity extends Activity {
+    // location service connection
+    private LocationService locationService;
 
-    /** Called when the activity is first created. */
+    private ServiceConnection locationServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder binder) {
+            Log.v("MainActivity", "Connected to location service");
+            locationService = ((LocationService.Binder) binder).getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName className) {
+            Log.v("MainActivity", "Disconnected from location service");
+            locationService = null;
+        }
+    };
+
+    RelativeLayout container;
+    MapFragment mapFragment;
+    Button placeholder1;
+    Button placeholder2;
+    MainGamePanel gameView;
+
+    // activity lifecycle
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
-        // generated, do not modify
+    public void onCreate(Bundle savedInstanceState) {
+        Log.v("MainActivity", "onCreate");
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        // Creating bird animations
-/*        ImageView firstBird = (ImageView)findViewById(R.id.birdOne);
-        ImageView secondBird = (ImageView)findViewById(R.id.birdTwo);
-        ImageView thirdBird = (ImageView)findViewById(R.id.birdThree);
-        ImageView fourthBird = (ImageView)findViewById(R.id.birdFour);
-        ImageView fifthBird = (ImageView)findViewById(R.id.birdFive);
-        setupAnimations(firstBird);
-        setupAnimations(secondBird);
-        setupAnimations(thirdBird);
-        setupAnimations(fourthBird);
-        setupAnimations(fifthBird);
-*/
-
-        setContentView(new MainGamePanel(this));
-
-
-
-/*
-
-        // setup drawing:
-        birdView canvasView = new birdView(this);
-
-        LinearLayout birdLayout = (LinearLayout)findViewById(R.id.branchtest);
-        birdLayout.addView(canvasView);
-        //setContentView(birdLayout);
-*/
-        // check for google play services (required by maps api)
+        // check for google play services (required by location services and maps api)
         Log.v("MainActivity", "Checking for Google Play Services");
         int gplayStatus = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext());
         if(gplayStatus != ConnectionResult.SUCCESS) {
@@ -76,78 +78,86 @@ public class MainActivity extends Activity
         else
             Log.v("MainActivity", "Google Play Services up-to-date");
 
-        /*
-        // example that retrieves json and puts it in the default textview
-        final TextView tv = (TextView) findViewById(R.id.text);
+        // create auxiliary views
+        mapFragment = MapFragment.newInstance();
 
-        new RequestTask("http://sirius.nss.cs.ubc.ca:8080/find_clinic", new RequestHandler() {
-            public void onSuccess(String response) {
-                tv.setText(response);
-            }
+        placeholder1 = new Button(this);
+        placeholder1.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.FILL_PARENT, RelativeLayout.LayoutParams.FILL_PARENT));
+        placeholder1.setText("~");
 
-            public void onFailure() {
-                tv.setText("Error");
-            }
-        })
-            .bind("pos_x", "0")
-            .bind("pos_y", "0")
-            .bind("min_results", "2")
-            .bind("max_results", "8")
-            .execute();
-        */
+        placeholder2 = new Button(this);
+        placeholder2.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.FILL_PARENT, RelativeLayout.LayoutParams.FILL_PARENT));
+        placeholder2.setText("~");
 
-        setupNotificationQuery();
+        gameView = new MainGamePanel(this);
+
+        // find container view
+        container = (RelativeLayout) findViewById(R.id.container);
+
+        // add all views to container
+        getFragmentManager().beginTransaction()
+            .add(R.id.container, mapFragment)
+            .commit();
+
+        container.addView(placeholder1);
+        container.addView(placeholder2);
+        container.addView(gameView);
+
+        // show main view
+        getFragmentManager().beginTransaction()
+            .hide(mapFragment)
+            .commit();
+
+        placeholder2.setVisibility(View.GONE);
     }
 
-    private Handler handler = new Handler();
-    private static final int NOTIFICATION_PERIOD = 5*1000;
+    @Override
+    public void onStart() {
+        Log.v("MainActivity", "onStart");
 
-    private void setupNotificationQuery() {
-        handler.removeCallbacks(requestNotifications);
-        handler.postDelayed(requestNotifications, NOTIFICATION_PERIOD);
-        Log.v("MainActivity", "set up notification timer");
+        super.onStart();
+        Intent intent = new Intent(this, LocationService.class);
+        bindService(intent, locationServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
-    private Runnable requestNotifications = new Runnable() {
-        public void run() {
-            RequestTask r = new RequestTask(
-                SERVER + "/status", new RequestHandler() {
+    @Override
+    public void onStop() {
+        Log.v("MainActivity", "onStop");
 
-                public void onSuccess(String response) {
-                    Log.v("MainActivity", "Got status: " + response);
-                }
-
-                public void onFailure() {
-                    Log.v("MainActivity", "Failed to retrieve status");
-                }
-            });
-            r.bind("session_id", SESSION_ID);
-            r.bind("pos_x", 0);
-            r.bind("pos_y", 0);
-
-            r.execute();
-
-            // schedule the next status request
-            handler.postDelayed(this, NOTIFICATION_PERIOD);
-        }
-    };
-
-
-//    AnimationDrawable birdAnimation;
-    private void setupAnimations(ImageView birdie) {
-        birdie.setBackgroundResource(R.drawable.bird);
-        AnimationDrawable birdAnimation = (AnimationDrawable) birdie.getBackground();
-        birdAnimation.start();
+        super.onStop();
+        unbindService(locationServiceConnection);
     }
 
-    class birdView extends SurfaceView {
-        public birdView(Context context) {
-            super(context);
-        }
-        @Override
-        protected void onDraw(Canvas canvas) {
-            Log.v("MainActivity", "Called 'onDraw'");
-            canvas.drawColor(Color.DKGRAY);
-        }
+    // button callbacks
+    public void showMap(View view) {
+        getFragmentManager().beginTransaction()
+            .show(mapFragment)
+            .commit();
+
+        placeholder1.setVisibility(View.GONE);
+        placeholder2.setVisibility(View.GONE);
+        gameView.setVisibility(View.GONE);
+    }
+
+    public void showMain(View view) {
+        placeholder1.setVisibility(View.VISIBLE);
+        gameView.setVisibility(View.VISIBLE);
+
+        getFragmentManager().beginTransaction()
+            .hide(mapFragment)
+            .commit();
+
+        placeholder2.setVisibility(View.GONE);
+    }
+
+    public void showNotifications(View view) {
+        placeholder2.setVisibility(View.VISIBLE);
+        gameView.setVisibility(View.VISIBLE);
+
+        getFragmentManager().beginTransaction()
+            .hide(mapFragment)
+            .commit();
+
+        placeholder1.setVisibility(View.GONE);
     }
 }
