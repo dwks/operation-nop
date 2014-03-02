@@ -13,7 +13,13 @@ final static public String tag = "MainActivity";
 private GameThread gameThread;  // For our thread needed to do logical processing without holding up the UI thread
 private SurfaceHolder holder; // For our CallBacks.. (One of the areas I don't understand!)
 
-boolean startCalled;
+  boolean startCalled;
+  Paint paintBranchImg;
+  Bitmap branchImg;
+  Bitmap[] birdImg;
+  NopObject branch_;
+  NopObject[] birds_;
+                                                  
 public MainGamePanel(Context context) {
     super(context);
     Log.d(tag, "Inside MainGamePanel");
@@ -65,33 +71,60 @@ public MainGamePanel(Context context) {
 
         }
     });
-}
 
-//Define bitmaps for drawing:
-Paint paintBranchImg = new Paint();
-Bitmap branchImg = BitmapFactory.decodeResource(getResources(), R.drawable.branch_full);
+    paintBranchImg = new Paint();
+    branchImg = BitmapFactory.decodeResource(
+        getResources(), R.drawable.branch_full);
+    birdImg = new Bitmap[4];
+    birdImg[0] = BitmapFactory.decodeResource(
+        getResources(), R.drawable.bird_happy1_full);    
+    birdImg[1] = BitmapFactory.decodeResource(
+        getResources(), R.drawable.bird_happy2_full);    
+    birdImg[2] = BitmapFactory.decodeResource(
+        getResources(), R.drawable.bird_sad1_full);    
+    birdImg[3] = BitmapFactory.decodeResource(
+        getResources(), R.drawable.bird_sad2_full);
+
+    branch_ = new NopObject(100, 100, 100, 100, 1, true, branchImg);
+    birds_ = new NopObject[5];
+    birds_[0] = new NopObject(100, 100, 100, 100, 1, true, birdImg[0]);
+    birds_[1] = new NopObject(110, 110, 100, 100, 1, true, birdImg[0]);
+    birds_[2] = new NopObject(120, 120, 100, 100, 1, true, birdImg[0]);
+    birds_[3] = new NopObject(130, 130, 100, 100, 1, true, birdImg[0]);
+    birds_[4] = new NopObject(140, 140, 100, 100, 1, true, birdImg[0]);
+}
 
 @Override
 protected void onDraw(Canvas canvas) {
 //This is where we draw stuff..  since this is just a skeleton demo, we only draw the color Dark Grey so we can visibly see that we actually accomplished something with the surfaceview drawing
     if (canvas == null) {
+      Log.d("MainActivitiy", "canvas is null"); 
         //gameThread.setRunning(false); // Stop the Thread from running because the surface was destroyed.  Can't play a game with no surface!!  
         return;
     }
+
     Log.d("MainActivitiy", "Inside onDraw"); 
 
     // This is where all the bird animation stuff is drawn...
 
     canvas.drawColor(0xb8c7cf); // background colour
 
-//    branchImg.setHeight( 50 );
+    //Define bitmaps for drawing:
+
+    //    branchImg.setHeight( 50 );
 //    branchImg.setWidth( 50 );
 
 
 //    branchImg.setHeight( canvas.getHeight() );
 //    branchImg.setWidth( canvas.getWidth() );
-    canvas.drawBitmap(branchImg, 0, 5, paintBranchImg);
+    // canvas.drawBitmap(branchImg, 0, 5, paintBranchImg);
+    // canvas.drawBitmap(birdImg[0], 1, 5, paintBranchImg);
 
+    branch_.draw(canvas, paintBranchImg);
+
+    for (NopObject bird : birds_) {
+      bird.draw(canvas, paintBranchImg);
+    }
 }
 
   public void stopThread() {
