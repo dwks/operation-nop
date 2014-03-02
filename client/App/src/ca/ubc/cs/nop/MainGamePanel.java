@@ -85,13 +85,15 @@ public MainGamePanel(Context context) {
     birdImg[3] = BitmapFactory.decodeResource(
         getResources(), R.drawable.bird_sad2_full);
 
+    int deadBirdOffset = 30;
+
     branch_ = new NopObject(0, 1, true, 0);
     birds_ = new NopObject[5];
-    birds_[0] = new NopObject(0, 50, true, 0);
-    birds_[1] = new NopObject(1, 50, true, 34);
-    birds_[2] = new NopObject(2, 50, true, 23);
-    birds_[3] = new NopObject(3, 50, true, 10);
-    birds_[4] = new NopObject(4, 50, false, 20);
+    birds_[0] = new NopObject(0, deadBirdOffset, true, 0);
+    birds_[1] = new NopObject(1, deadBirdOffset, true, 34);
+    birds_[2] = new NopObject(2, deadBirdOffset, true, 23);
+    birds_[3] = new NopObject(3, deadBirdOffset, true, 10);
+    birds_[4] = new NopObject(4, deadBirdOffset, false, 20);
 }
 
 @Override
@@ -110,8 +112,8 @@ protected void onDraw(Canvas canvas) {
     canvas.drawColor(0xb8c7cf); // background colour
 
     //sizing
-    int birdPadding = 6;
-    int branchOffset = 25;
+    int birdPadding = 1;
+    int branchOffset = 50;
 
     int branchWidth = canvas.getWidth();
     int branchHeight = branchWidth/4;
@@ -125,19 +127,19 @@ protected void onDraw(Canvas canvas) {
     branch_.setSize(branchPosX, branchPosY, branchWidth, branchHeight);
     branch_.draw(canvas, paintBranchImg, branchImg, branchImg, branchImg, branchImg);
 
-    birds_[0].setSize(leftPosX+birdWidth/2, topPosY, birdWidth, birdHeight);
+    birds_[0].setSize(leftPosX+birdWidth/2, topPosY+5, birdWidth, birdHeight);
     birds_[0].draw(canvas, paintBranchImg, birdImg[0], birdImg[1], birdImg[2], birdImg[3]);
 
     birds_[1].setSize(leftPosX+(birdWidth)+birdWidth/2+birdPadding, topPosY, birdWidth, birdHeight);
     birds_[1].draw(canvas, paintBranchImg, birdImg[0], birdImg[1], birdImg[2], birdImg[3]);
 
-    birds_[2].setSize(leftPosX+(birdWidth)*2+birdWidth/2+birdPadding*2, topPosY, birdWidth, birdHeight);
+    birds_[2].setSize(leftPosX+(birdWidth)*2+birdWidth/2+birdPadding*2, topPosY-5, birdWidth, birdHeight);
     birds_[2].draw(canvas, paintBranchImg, birdImg[0], birdImg[1], birdImg[2], birdImg[3]);
 
-    birds_[3].setSize(leftPosX+(birdWidth)*3+birdWidth/2+birdPadding*3, topPosY, birdWidth, birdHeight);
+    birds_[3].setSize(leftPosX+(birdWidth)*3+birdWidth/2+birdPadding*3, topPosY-1, birdWidth, birdHeight);
     birds_[3].draw(canvas, paintBranchImg, birdImg[0], birdImg[1], birdImg[2], birdImg[3]);
 
-    birds_[4].setSize(leftPosX+(birdWidth)*4+birdWidth/2+birdPadding*4, topPosY, birdWidth, birdHeight);
+    birds_[4].setSize(leftPosX+(birdWidth)*4+birdWidth/2+birdPadding*4, topPosY+6, birdWidth, birdHeight);
     birds_[4].draw(canvas, paintBranchImg, birdImg[0], birdImg[1], birdImg[2], birdImg[3]);
 }
 
