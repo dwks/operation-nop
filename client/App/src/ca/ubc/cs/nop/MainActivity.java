@@ -34,8 +34,14 @@ public class MainActivity extends Activity
 
         ImageView firstBird = (ImageView)findViewById(R.id.birdOne);
         ImageView secondBird = (ImageView)findViewById(R.id.birdTwo);
+        ImageView thirdBird = (ImageView)findViewById(R.id.birdThree);
+        ImageView fourthBird = (ImageView)findViewById(R.id.birdFour);
+        ImageView fifthBird = (ImageView)findViewById(R.id.birdFive);
         setupAnimations(firstBird);
         setupAnimations(secondBird);
+        setupAnimations(thirdBird);
+        setupAnimations(fourthBird);
+        setupAnimations(fifthBird);
 
         // check for google play services (required by maps api)
         Log.v("MainActivity", "Checking for Google Play Services");
