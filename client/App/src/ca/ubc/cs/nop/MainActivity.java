@@ -62,8 +62,6 @@ public class MainActivity extends Activity {
     // content views
     private RelativeLayout container;
     private MapFragment mapFragment;
-    private Button placeholder1;
-    private Button placeholder2;
     private MainGamePanel gameView;
 
     // map state
@@ -98,14 +96,6 @@ public class MainActivity extends Activity {
         // create auxiliary views
         mapFragment = MapFragment.newInstance();
 
-        placeholder1 = new Button(this);
-        placeholder1.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.FILL_PARENT, RelativeLayout.LayoutParams.FILL_PARENT));
-        placeholder1.setText("~");
-
-        placeholder2 = new Button(this);
-        placeholder2.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.FILL_PARENT, RelativeLayout.LayoutParams.FILL_PARENT));
-        placeholder2.setText("?");
-
         gameView = new MainGamePanel(this);
 
         // find container view
@@ -116,8 +106,6 @@ public class MainActivity extends Activity {
             .add(R.id.container, mapFragment)
             .commit();
 
-        container.addView(placeholder1);
-        container.addView(placeholder2);
         container.addView(gameView);
 
         // show main view
@@ -125,14 +113,12 @@ public class MainActivity extends Activity {
             .hide(mapFragment)
             .commit();
 
-        placeholder2.setVisibility(View.GONE);
-
         // set up continuous polling
         timer = new Handler();
 
         Runnable pollTask = new Runnable() {
             public void run() {
-                if(!locationService.isAvailable())
+                if(locationService == null || !locationService.isAvailable())
                     return;
 
                 Location location = locationService.getLocation();
@@ -210,13 +196,10 @@ public class MainActivity extends Activity {
             .show(mapFragment)
             .commit();
 
-        placeholder1.setVisibility(View.GONE);
-        placeholder2.setVisibility(View.GONE);
-
         gameView.setVisibility(View.GONE);
 
         // find clinic and place marker
-        if(!locationService.isAvailable())
+        if(locationService == null || !locationService.isAvailable())
             return;
 
         Location location = locationService.getLocation();
@@ -261,24 +244,18 @@ public class MainActivity extends Activity {
     }
 
     public void showMain(View view) {
-        placeholder1.setVisibility(View.VISIBLE);
         gameView.setVisibility(View.VISIBLE);
 
         getFragmentManager().beginTransaction()
             .hide(mapFragment)
             .commit();
-
-        placeholder2.setVisibility(View.GONE);
     }
 
     public void showNotifications(View view) {
-        placeholder2.setVisibility(View.VISIBLE);
         gameView.setVisibility(View.VISIBLE);
 
         getFragmentManager().beginTransaction()
             .hide(mapFragment)
             .commit();
-
-        placeholder1.setVisibility(View.GONE);
     }
 }
