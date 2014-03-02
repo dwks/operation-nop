@@ -133,12 +133,6 @@ public class MainActivity extends Activity {
 
         container.addView(gameView);
         container.addView(listView);
-
-        // show main view
-        getFragmentManager().beginTransaction()
-            .hide(mapFragment)
-            .commit();
-        listView.setVisibility(View.GONE);
     }
 
     // set up continuous polling
@@ -236,6 +230,8 @@ public class MainActivity extends Activity {
         bindService(intent, locationServiceConnection, Context.BIND_AUTO_CREATE);
         timer.removeCallbacks(pollTask);
         timer.postDelayed(pollTask, 200);
+
+        showMain(null);
     }
 
     @Override
