@@ -73,4 +73,13 @@ def GetAirQuality(air_quality_site):
         logging.error('Failed to find > in' + air_quality_site)
         return None  
 
-    return resp[start + 1:resp.find('<')]
+    air_quality_str = resp[start + 1:resp.find('<')]
+    try:
+        air_quality = float(air_quality_str)
+    except ValueError:
+        logging.error('Failed to parse float of air quality from: ' + air_quality_str)
+        return None
+
+    air_quality = 10 * (1 - min(air_quality, 300) / 300.0)
+
+    return air_quality
