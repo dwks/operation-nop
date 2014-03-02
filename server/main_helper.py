@@ -7,6 +7,7 @@ import json
 import operator
 import random
 import users
+import web_helper
 
 
 def ValidateArg(request, name, arg_type, remarks=None):
@@ -110,14 +111,25 @@ def LoginOrCreateUser(username, password):
     return users.GetUserSessionId(username)
 
 
-def GetStatus(session_id):
+def GetStatus(session_id, pos_x, pos_y):
     user = users.GetUserBySessionId(session_id)
     assert user
     username = users.GetUserName(user)
 
+    city, country, street, number = web_helper.GetCityName(pos_x, pos_y)
+
     response = {
         'status': random.randint(0, 10)
         }
+    if city:
+        response['city'] = city
+    if country:
+        response['country'] = country
+    if city:
+        response['street'] = street
+    if city:
+        response['number'] = number
+
     return json.dumps(response)
 
 

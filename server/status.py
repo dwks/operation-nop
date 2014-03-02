@@ -6,7 +6,11 @@ import urllib2
 def Status(session_id):
     url='http://localhost:8080/status'
     request = {
-        'session_id': session_id
+        'session_id': session_id,
+        'pos_x': -123.24853,
+        'pos_y': 49.26135
+        # 'pos_x': -123,
+        # 'pos_y': 49
         }
     SendRequest(url, request)
 
