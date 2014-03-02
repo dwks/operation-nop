@@ -22,7 +22,7 @@ def GetCityName(pos_x, pos_y):
         return UNKNOWN
 
     if response['status'] != 'OK':
-        logging.error('Status not ok')
+        logging.error('Status not ok for (%f, %f)' % (pos_x, pos_y))
         return UNKNOWN
     
     result = response['results'][0]

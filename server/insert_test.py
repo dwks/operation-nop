@@ -5,7 +5,7 @@ import urllib
 import urllib2
 
 def InsertData(table_name):
-    url='http://localhost:8080/insert_data'
+    url='http://localhost:9090/insert_data'
 
     if len(sys.argv) > 1:
         filename = sys.argv[1]
