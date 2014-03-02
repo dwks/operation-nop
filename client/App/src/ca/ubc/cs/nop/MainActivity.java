@@ -49,6 +49,7 @@ import android.widget.*;
 import android.view.*;
 import android.graphics.*;
 import android.content.*;
+import android.view.Gravity;
 
 public class MainActivity extends Activity {
     // location service connection
@@ -73,6 +74,7 @@ public class MainActivity extends Activity {
     private MapFragment mapFragment;
     private MainGamePanel gameView;
     private ListView listView;
+    private TextView mainTextView;
 
     // map state
     private GoogleMap map;
@@ -116,11 +118,17 @@ public class MainActivity extends Activity {
         mapFragment = MapFragment.newInstance();
         gameView = new MainGamePanel(this);
         listView = new ListView(this);
+        mainTextView = new TextView(this);
         notificationAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, notifications);
         listView.setAdapter(notificationAdapter);
 
+        mainTextView.setText("Welcome to Canary! \n \n Current health status: " + Globals.status*10 + "%");
+        mainTextView.setGravity(Gravity.CENTER_HORIZONTAL);
+        mainTextView.setTextSize(26);
+
         // set view weights
         listView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1));
+        mainTextView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1));
         gameView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 3));
 
         // find container view
@@ -133,12 +141,15 @@ public class MainActivity extends Activity {
 
         container.addView(gameView);
         container.addView(listView);
+        container.addView(mainTextView);
 
         // show main view
         getFragmentManager().beginTransaction()
             .hide(mapFragment)
             .commit();
+        gameView.setVisibility(View.VISIBLE);
         listView.setVisibility(View.GONE);
+        mainTextView.setVisibility(View.VISIBLE);
     }
 
     // set up continuous polling
@@ -314,10 +325,12 @@ public class MainActivity extends Activity {
         // go to us
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 10));
         listView.setVisibility(View.GONE);
+        mainTextView.setVisibility(View.GONE);
     }
 
     public void showMain(View view) {
         gameView.setVisibility(View.VISIBLE);
+        mainTextView.setVisibility(View.VISIBLE);
 
         getFragmentManager().beginTransaction()
             .hide(mapFragment)
@@ -332,5 +345,7 @@ public class MainActivity extends Activity {
         getFragmentManager().beginTransaction()
             .hide(mapFragment)
             .commit();
+
+        mainTextView.setVisibility(View.GONE);
     }
 }
