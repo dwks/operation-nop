@@ -17,6 +17,8 @@ import android.os.Handler;
 public class MainActivity extends Activity
 {
     public static final String SERVER = "http://sirius.nss.cs.ubc.ca:8080";
+    public static final String SESSION_ID
+        = "f55c5204-2980-4f3c-ba2e-8a0bbc340d3c";
 
     /** Called when the activity is first created. */
     @Override
@@ -75,7 +77,9 @@ public class MainActivity extends Activity
 
     private Runnable requestNotifications = new Runnable() {
         public void run() {
-            new RequestTask(SERVER + "/status", new RequestHandler() {
+            RequestTask r = new RequestTask(
+                SERVER + "/status", new RequestHandler() {
+
                 public void onSuccess(String response) {
                     Log.v("MainActivity", "Got status: " + response);
                 }
@@ -83,8 +87,14 @@ public class MainActivity extends Activity
                 public void onFailure() {
                     Log.v("MainActivity", "Failed to retrieve status");
                 }
-            }).execute();
+            });
+            r.bind("session_id", SESSION_ID);
+            r.bind("pos_x", 0);
+            r.bind("pos_y", 0);
 
+            r.execute();
+
+            // schedule the next status request
             handler.postDelayed(this, NOTIFICATION_PERIOD);
         }
     };
