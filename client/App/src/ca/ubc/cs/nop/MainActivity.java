@@ -14,6 +14,10 @@ import android.widget.TextView;
 import android.util.Log;
 import android.os.Handler;
 
+// animation stuff
+import android.graphics.drawable.*;
+import android.widget.*;
+
 public class MainActivity extends Activity
 {
     public static final String SERVER = "http://sirius.nss.cs.ubc.ca:8080";
@@ -27,6 +31,9 @@ public class MainActivity extends Activity
         // generated, do not modify
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+
+        LinearLayout mainLayout = (LinearLayout)findViewById(R.id.mainLayout);
+        setupAnimations(mainLayout);
 
         // check for google play services (required by maps api)
         Log.v("MainActivity", "Checking for Google Play Services");
@@ -98,4 +105,10 @@ public class MainActivity extends Activity
             handler.postDelayed(this, NOTIFICATION_PERIOD);
         }
     };
+
+
+    AnimationDrawable birdAnimation;
+    private void setupAnimations(LinearLayout mainLayout) {
+        mainLayout.setBackgroundResource(R.drawable.bird);
+    }
 }
