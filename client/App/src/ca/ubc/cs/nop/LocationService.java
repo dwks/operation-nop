@@ -71,8 +71,11 @@ public class LocationService extends Service
 
     public Location getLocation() {
         try {
-            if(connected)
-                lastKnownLocation = client.getLastLocation();
+            if(connected) {
+                Location theLocation = client.getLastLocation();
+                if(theLocation != null)
+                    lastKnownLocation = theLocation;
+            }
         }
 
         catch(IllegalStateException e) {
