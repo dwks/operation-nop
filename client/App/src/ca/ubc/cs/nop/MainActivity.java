@@ -7,6 +7,11 @@ import com.google.android.gms.common.GooglePlayServicesClient;
 
 // google maps stuff
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.GoogleMap;
+
+// json stuff
+import org.json.JSONObject;
+import org.json.JSONException;
 
 // android stuff
 import android.app.Activity;
@@ -16,6 +21,7 @@ import android.content.ServiceConnection;
 import android.content.ComponentName;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Handler;
 import android.app.Dialog;
 import android.view.View;
 import android.util.Log;
@@ -49,11 +55,18 @@ public class MainActivity extends Activity {
         }
     };
 
-    RelativeLayout container;
-    MapFragment mapFragment;
-    Button placeholder1;
-    Button placeholder2;
-    MainGamePanel gameView;
+    // content views
+    private RelativeLayout container;
+    private MapFragment mapFragment;
+    private Button placeholder1;
+    private Button placeholder2;
+    private MainGamePanel gameView;
+
+    // map state
+    private GoogleMap map;
+
+    // timer
+    private Handler timer;
 
     // activity lifecycle
     @Override
@@ -87,7 +100,7 @@ public class MainActivity extends Activity {
 
         placeholder2 = new Button(this);
         placeholder2.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.FILL_PARENT, RelativeLayout.LayoutParams.FILL_PARENT));
-        placeholder2.setText("~");
+        placeholder2.setText("?");
 
         gameView = new MainGamePanel(this);
 
@@ -109,6 +122,51 @@ public class MainActivity extends Activity {
             .commit();
 
         placeholder2.setVisibility(View.GONE);
+
+        // set up continuous polling
+        timer = new Handler();
+
+        Runnable pollTask = new Runnable() {
+            public void run() {
+                if(!locationService.isAvailable())
+                    return;
+
+                Location location = locationService.getLocation();
+
+                new RequestTask(Globals.SERVER + "/status", new RequestHandler() {
+                    public void onSuccess(String response) {
+                        try {
+                            JSONObject json = new JSONObject(response);
+
+                            Log.v("MainActivity", "Got status update: " + json.optString("status"));
+                            Log.v("MainActivity", "Got city update: " + json.optString("city"));
+                            Log.v("MainActivity", "Got country update: " + json.optString("country"));
+                            Log.v("MainActivity", "Got street update: " + json.optString("street"));
+                            Log.v("MainActivity", "Got street number update: " + json.optString("number"));
+                            Log.v("MainActivity", "Got air quality update: " + json.optString("air_quality"));
+
+                            // etc
+                        }
+
+                        catch(JSONException e) {
+                            Log.v("MainActivity", "Invalid JSON returned");
+                        }
+                    }
+
+                    public void onFailure() {
+                        Log.v("MainActivity", "Status request failed");
+                    }
+                })
+                    .bind("session_id", Globals.SESSION_ID)
+                    .bind("pos_x", String.valueOf(location.getLongitude()))
+                    .bind("pos_y", String.valueOf(location.getLatitude()))
+                    .execute();
+
+                timer.postDelayed(this, 5000);
+            }
+        };
+
+        timer.postDelayed(pollTask, 5000);
     }
 
     @Override
@@ -116,6 +174,8 @@ public class MainActivity extends Activity {
         Log.v("MainActivity", "onStart");
 
         super.onStart();
+
+        // bind to location service
         Intent intent = new Intent(this, LocationService.class);
         bindService(intent, locationServiceConnection, Context.BIND_AUTO_CREATE);
     }
@@ -142,6 +202,9 @@ public class MainActivity extends Activity {
 
         placeholder1.setVisibility(View.GONE);
         placeholder2.setVisibility(View.GONE);
+
+        map = mapFragment.getMap();
+        map.setMyLocationEnabled(true);
         gameView.setVisibility(View.GONE);
     }
 
