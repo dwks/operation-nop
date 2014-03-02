@@ -39,7 +39,7 @@ import android.location.Location;
 // widgets
 import android.widget.Toast;
 import android.widget.Button;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ArrayAdapter;
 
@@ -69,7 +69,7 @@ public class MainActivity extends Activity {
     };
 
     // content views
-    private RelativeLayout container;
+    private LinearLayout container;
     private MapFragment mapFragment;
     private MainGamePanel gameView;
     private ListView listView;
@@ -119,8 +119,12 @@ public class MainActivity extends Activity {
         notificationAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, notifications);
         listView.setAdapter(notificationAdapter);
 
+        // set view weights
+        listView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1));
+        gameView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 3));
+
         // find container view
-        container = (RelativeLayout) findViewById(R.id.container);
+        container = (LinearLayout) findViewById(R.id.container);
 
         // add all views to container
         getFragmentManager().beginTransaction()
@@ -134,6 +138,7 @@ public class MainActivity extends Activity {
         getFragmentManager().beginTransaction()
             .hide(mapFragment)
             .commit();
+        listView.setVisibility(View.GONE);
     }
 
     // set up continuous polling
@@ -308,6 +313,7 @@ public class MainActivity extends Activity {
 
         // go to us
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 10));
+        listView.setVisibility(View.GONE);
     }
 
     public void showMain(View view) {
@@ -316,6 +322,7 @@ public class MainActivity extends Activity {
         getFragmentManager().beginTransaction()
             .hide(mapFragment)
             .commit();
+        listView.setVisibility(View.GONE);
     }
 
     public void showNotifications(View view) {
