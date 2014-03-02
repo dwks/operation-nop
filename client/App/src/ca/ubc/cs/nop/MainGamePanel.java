@@ -9,7 +9,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 public class MainGamePanel extends SurfaceView {
-final static public String tag = "Tracer";
+final static public String tag = "MainActivity";
 
 private GameThread gameThread;  // For our thread needed to do logical processing without holding up the UI thread
 private SurfaceHolder holder; // For our CallBacks.. (One of the areas I don't understand!)
@@ -28,22 +28,22 @@ public MainGamePanel(Context context) {
 // Since we are using the SurfaceView, we need to use, at very least, the surfaceDestroyed and surfaceCreated methods.
         @Override
         public void surfaceDestroyed(SurfaceHolder holder) {
-            boolean retry = true;
-            Log.d(tag, "Inside SurfaceHolder Callback - surfaceDestroyed");
+        //     boolean retry = true;
+        //     Log.d(tag, "Inside SurfaceHolder Callback - surfaceDestroyed");
 /*            if (startCalled) {
                 startCalled = false;
                 gameThread.setRunning(false); // Stop the Thread from running because the surface was destroyed.  Can't play a game with no surface!!  
             }
 */
-            while (retry) { 
-                try {
-                    Log.d(tag, "Inside SurfaceHolder Callback - surfaceDestroyed - while statement");
-                    gameThread.join();
-                    retry = false; //Loop until game thread is done, making sure the thread is taken care of.
-                } catch (InterruptedException e) {
-                    //  In case of catastrophic failure catch error!!!
-                }
-            }
+        //     while (retry) { 
+        //         try {
+        //             Log.d(tag, "Inside SurfaceHolder Callback - surfaceDestroyed - while statement");
+        //             gameThread.join();
+        //             retry = false; //Loop until game thread is done, making sure the thread is taken care of.
+        //         } catch (InterruptedException e) {
+        //             //  In case of catastrophic failure catch error!!!
+        //         }
+        //     }
 
         }
 
@@ -72,7 +72,7 @@ public MainGamePanel(Context context) {
 protected void onDraw(Canvas canvas) {
 //This is where we draw stuff..  since this is just a skeleton demo, we only draw the color Dark Grey so we can visibly see that we actually accomplished something with the surfaceview drawing
         if (canvas == null) {
-            gameThread.setRunning(false); // Stop the Thread from running because the surface was destroyed.  Can't play a game with no surface!!  
+            // gameThread.setRunning(false); // Stop the Thread from running because the surface was destroyed.  Can't play a game with no surface!!  
             return;
         }
     Log.d("MainActivitiy", "Inside onDraw"); 
@@ -80,4 +80,22 @@ protected void onDraw(Canvas canvas) {
 
     }
 
+  public void stopThread() {
+    boolean retry = true;
+    Log.d(tag, "Stopping thread");
+    if (startCalled) {
+      startCalled = false;
+      gameThread.setRunning(false);  
+
+      while (retry) { 
+        try {
+          Log.d(tag, "Inside stopThread while statement");
+          gameThread.join();
+          retry = false; //Loop until game thread is done, making sure the thread is taken care of.
+        } catch (InterruptedException e) {
+          //  In case of catastrophic failure catch error!!!
+        }
+      }
+    }
+  }
 }
