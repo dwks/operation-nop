@@ -68,9 +68,6 @@ public class MainActivity extends Activity {
     // map state
     private GoogleMap map;
 
-    // timer
-    private Handler timer;
-
     // activity lifecycle
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -96,7 +93,6 @@ public class MainActivity extends Activity {
 
         // create auxiliary views
         mapFragment = MapFragment.newInstance();
-
         gameView = new MainGamePanel(this);
 
         // find container view
@@ -113,52 +109,82 @@ public class MainActivity extends Activity {
         getFragmentManager().beginTransaction()
             .hide(mapFragment)
             .commit();
-
-        // set up continuous polling
-        timer = new Handler();
-
-        Runnable pollTask = new Runnable() {
-            public void run() {
-                if(locationService == null || !locationService.isAvailable())
-                    return;
-
-                Location location = locationService.getLocation();
-
-                new RequestTask(Globals.SERVER + "/status", new RequestHandler() {
-                    public void onSuccess(String response) {
-                        try {
-                            JSONObject json = new JSONObject(response);
-
-                            Log.v("MainActivity", "Got status update: " + json.optString("status"));
-                            Log.v("MainActivity", "Got city update: " + json.optString("city"));
-                            Log.v("MainActivity", "Got country update: " + json.optString("country"));
-                            Log.v("MainActivity", "Got street update: " + json.optString("street"));
-                            Log.v("MainActivity", "Got street number update: " + json.optString("number"));
-                            Log.v("MainActivity", "Got air quality update: " + json.optString("air_quality"));
-
-                            // etc
-                        }
-
-                        catch(JSONException e) {
-                            Log.v("MainActivity", "Invalid JSON returned");
-                        }
-                    }
-
-                    public void onFailure() {
-                        Log.v("MainActivity", "Status request failed");
-                    }
-                })
-                    .bind("session_id", Globals.SESSION_ID)
-                    .bind("pos_x", String.valueOf(location.getLongitude()))
-                    .bind("pos_y", String.valueOf(location.getLatitude()))
-                    .execute();
-
-                timer.postDelayed(this, 5000);
-            }
-        };
-
-        timer.postDelayed(pollTask, 5000);
     }
+
+    // set up continuous polling
+    private Handler timer = new Handler();
+
+    Runnable pollTask = new Runnable() {
+        public void run() {
+            if(locationService == null || !locationService.isAvailable())
+                return;
+
+            Location location = locationService.getLocation();
+
+            Globals.longitude = location.getLongitude();
+            Globals.latitude = location.getLatitude();
+
+            new RequestTask(Globals.SERVER + "/status", new RequestHandler() {
+                public void onSuccess(String response) {
+                    try {
+                        JSONObject json = new JSONObject(response);
+
+                        Globals.status = json.optDouble("status", Globals.status);
+                        Globals.city = json.optString("city", Globals.city);
+                        Globals.country = json.optString("country", Globals.country);
+                        Globals.street = json.optString("street", Globals.street);
+                        Globals.number = json.optString("number", Globals.number);
+                        Globals.airQuality = json.optDouble("air_quality", Globals.airQuality);
+
+                        JSONArray fluPeople = json.optJSONArray("flu_people");
+                        if(fluPeople != null) {
+                            Globals.fluPeople[0] = fluPeople.optDouble(0, Globals.fluPeople[0]);
+                            Globals.fluPeople[1] = fluPeople.optDouble(1, Globals.fluPeople[1]);
+                            Globals.fluPeople[2] = fluPeople.optDouble(2, Globals.fluPeople[2]);
+                        }
+
+                        JSONArray fluHospitals = json.optJSONArray("flu_hospitals");
+                        if(fluHospitals != null) {
+                            Globals.fluHospitals[0] = fluHospitals.optDouble(0, Globals.fluHospitals[0]);
+                            Globals.fluHospitals[1] = fluHospitals.optDouble(1, Globals.fluHospitals[1]);
+                            Globals.fluHospitals[2] = fluHospitals.optDouble(2, Globals.fluHospitals[2]);
+                        }
+
+                        JSONArray fluWorkPlaces = json.optJSONArray("flu_work_places");
+                        if(fluWorkPlaces != null) {
+                            Globals.fluWorkPlaces[0] = fluWorkPlaces.optDouble(0, Globals.fluWorkPlaces[0]);
+                            Globals.fluWorkPlaces[1] = fluWorkPlaces.optDouble(1, Globals.fluWorkPlaces[1]);
+                            Globals.fluWorkPlaces[2] = fluWorkPlaces.optDouble(2, Globals.fluWorkPlaces[2]);
+                        }
+
+                        Log.v("MainActivity", "Got status update: " + Globals.status);
+                        Log.v("MainActivity", "Got city update: " + Globals.city);
+                        Log.v("MainActivity", "Got country update: " + Globals.country);
+                        Log.v("MainActivity", "Got street update: " + Globals.street);
+                        Log.v("MainActivity", "Got number update: " + Globals.number);
+                        Log.v("MainActivity", "Got air quality update: " + Globals.airQuality);
+                        Log.v("MainActivity", "Got flu people update: " + Globals.fluPeople[0] + ", " + Globals.fluPeople[1] + ", " + Globals.fluPeople[2]);
+                        Log.v("MainActivity", "Got flu hospitals update: " + Globals.fluHospitals[0] + ", " + Globals.fluHospitals[1] + ", " + Globals.fluHospitals[2]);
+                        Log.v("MainActivity", "Got flu work places update: " + Globals.fluWorkPlaces[0] + ", " + Globals.fluWorkPlaces[1] + ", " + Globals.fluWorkPlaces[2]);
+                    }
+
+                    catch(JSONException e) {
+                        Log.v("MainActivity", "Invalid JSON returned");
+                    }
+                }
+
+                public void onFailure() {
+                    Log.v("MainActivity", "Status request failed");
+                }
+            })
+                .bind("session_id", Globals.SESSION_ID)
+                .bind("pos_x", String.valueOf(location.getLongitude()))
+                .bind("pos_y", String.valueOf(location.getLatitude()))
+                .execute();
+
+            timer.postDelayed(this, 5000);
+        }
+    };
 
     @Override
     public void onStart() {
@@ -169,6 +195,8 @@ public class MainActivity extends Activity {
         // bind to location service
         Intent intent = new Intent(this, LocationService.class);
         bindService(intent, locationServiceConnection, Context.BIND_AUTO_CREATE);
+        timer.removeCallbacks(pollTask);
+        timer.postDelayed(pollTask, 5000);
     }
 
     @Override
@@ -177,6 +205,7 @@ public class MainActivity extends Activity {
 
         super.onStop();
         unbindService(locationServiceConnection);
+        timer.removeCallbacks(pollTask);
     }
 
     @Override
