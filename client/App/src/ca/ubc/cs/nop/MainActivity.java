@@ -1,5 +1,9 @@
 package ca.ubc.cs.nop;
 
+// java stuff
+import java.util.ArrayList;
+import java.text.DecimalFormat;
+
 // google play services stuff
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.ConnectionResult;
@@ -31,9 +35,13 @@ import android.app.Dialog;
 import android.view.View;
 import android.util.Log;
 import android.location.Location;
+
+// widgets
 import android.widget.Toast;
 import android.widget.Button;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.ArrayAdapter;
 
 // animation stuff
 import android.graphics.drawable.*;
@@ -61,12 +69,17 @@ public class MainActivity extends Activity {
     };
 
     // content views
-    private RelativeLayout container;
+    private LinearLayout container;
     private MapFragment mapFragment;
     private MainGamePanel gameView;
+    private ListView listView;
 
     // map state
     private GoogleMap map;
+
+    // notification state
+    private ArrayList<String> notifications = new ArrayList<String>();
+    private ArrayAdapter<String> notificationAdapter;
 
     // activity lifecycle
     @Override
@@ -91,12 +104,27 @@ public class MainActivity extends Activity {
         else
             Log.v("MainActivity", "Google Play Services up-to-date");
 
+        // empty notifications
+        notifications.add("Current city: " + Globals.city);
+        notifications.add("Flu trend (per person): " + Globals.fluPeople[1]);
+        notifications.add("Flu trend (per hospital): " + Globals.fluHospitals[1]);
+        notifications.add("Flu trend (per workplace): " + Globals.fluWorkPlaces[1]);
+        notifications.add("Air quality: " + Globals.airQuality + "/10");
+        notifications.add("Risk assessment: " + Globals.status + "/10");
+
         // create auxiliary views
         mapFragment = MapFragment.newInstance();
         gameView = new MainGamePanel(this);
+        listView = new ListView(this);
+        notificationAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, notifications);
+        listView.setAdapter(notificationAdapter);
+
+        // set view weights
+        listView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1));
+        gameView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 3));
 
         // find container view
-        container = (RelativeLayout) findViewById(R.id.container);
+        container = (LinearLayout) findViewById(R.id.container);
 
         // add all views to container
         getFragmentManager().beginTransaction()
@@ -104,11 +132,13 @@ public class MainActivity extends Activity {
             .commit();
 
         container.addView(gameView);
+        container.addView(listView);
 
         // show main view
         getFragmentManager().beginTransaction()
             .hide(mapFragment)
             .commit();
+        listView.setVisibility(View.GONE);
     }
 
     // set up continuous polling
@@ -157,6 +187,15 @@ public class MainActivity extends Activity {
                             Globals.fluWorkPlaces[2] = fluWorkPlaces.optDouble(2, Globals.fluWorkPlaces[2]);
                         }
 
+                        notifications.set(0, "Current city: " + Globals.city);
+                        notifications.set(1, "Flu trend (per person): " + (Globals.fluPeople[1] > 0 ? "up " : "down ") + new DecimalFormat("#.##").format(Math.abs(Globals.fluPeople[1])));
+                        notifications.set(2, "Flu trend (per hospital): " + (Globals.fluHospitals[1] > 0 ? "up " : "down ") + new DecimalFormat("#.##").format(Math.abs(Globals.fluHospitals[1])));
+                        notifications.set(3, "Flu trend (per workplace): " + (Globals.fluWorkPlaces[1] > 0 ? "up " : "down ") + new DecimalFormat("#.##").format(Math.abs(Globals.fluWorkPlaces[1])));
+                        notifications.set(4, "Air quality: " + Globals.airQuality + "/10");
+                        notifications.set(5, "Risk assessment: " + new DecimalFormat("#.##").format(Globals.status) + "/10");
+
+                        notificationAdapter.notifyDataSetChanged();
+
                         Log.v("MainActivity", "Got status update: " + Globals.status);
                         Log.v("MainActivity", "Got city update: " + Globals.city);
                         Log.v("MainActivity", "Got country update: " + Globals.country);
@@ -196,7 +235,7 @@ public class MainActivity extends Activity {
         Intent intent = new Intent(this, LocationService.class);
         bindService(intent, locationServiceConnection, Context.BIND_AUTO_CREATE);
         timer.removeCallbacks(pollTask);
-        timer.postDelayed(pollTask, 5000);
+        timer.postDelayed(pollTask, 200);
     }
 
     @Override
@@ -274,6 +313,7 @@ public class MainActivity extends Activity {
 
         // go to us
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 10));
+        listView.setVisibility(View.GONE);
     }
 
     public void showMain(View view) {
@@ -282,10 +322,12 @@ public class MainActivity extends Activity {
         getFragmentManager().beginTransaction()
             .hide(mapFragment)
             .commit();
+        listView.setVisibility(View.GONE);
     }
 
     public void showNotifications(View view) {
         gameView.setVisibility(View.VISIBLE);
+        listView.setVisibility(View.VISIBLE);
 
         getFragmentManager().beginTransaction()
             .hide(mapFragment)

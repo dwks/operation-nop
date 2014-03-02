@@ -8,12 +8,13 @@
     android:gravity="bottom">
 
   <!-- container for content views, which are generated on the fly -->
-  <RelativeLayout
+  <LinearLayout
     android:id="@+id/container"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:layout_weight="4">
-  </RelativeLayout>
+    android:layout_weight="4"
+    android:orientation="vertical">
+  </LinearLayout>
 
   <!-- navigation buttons -->
   <LinearLayout
