@@ -7,22 +7,17 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 public class NopObject {
-  int x_;
-  int y_;
   int dropOffset_;
   boolean alive_;
   Rect rect_;
   int tickCounter_;
   int frame_;
-  public NopObject(
-      int x, int y, int dropOffset, boolean alive, int seed) {
-    x_ = x;
-    y_ = y;
+  public NopObject(int dropOffset, boolean alive, int seed) {
     dropOffset_ = dropOffset;
     alive_ = alive;
 
     rect_ = new Rect();
-    setSize(0, 0);
+    setSize(0, 0, 0, 0);
 
     frame_ = 0;
     tickCounter_ = seed;
@@ -63,10 +58,10 @@ public class NopObject {
     }
   }
 
-  public void setSize(int width, int height) {
-    rect_.left = x_- width / 2;
-    rect_.right = x_ + width / 2;
-    rect_.top = y_ - height / 2;
-    rect_.bottom = y_ + height / 2;
+  public void setSize(int x, int y, int width, int height) {
+    rect_.left = x- width / 2;
+    rect_.right = x + width / 2;
+    rect_.top = y - height / 2;
+    rect_.bottom = y + height / 2;
   }
 }

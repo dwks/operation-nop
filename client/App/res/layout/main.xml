@@ -26,19 +26,26 @@
         android:layout_height="50dp"
         android:text="Hospital"
         android:onClick="showMap"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        style="@style/navigation"
+        />
       <Button
         android:layout_width="fill_parent"
         android:layout_height="50dp"
         android:text="Main"
         android:onClick="showMain"
         android:layout_weight="1"
+        style="@style/navigation"
         />
       <Button
         android:layout_width="fill_parent"
         android:layout_height="50dp"
         android:text="Notifications"
         android:onClick="showNotifications"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        style="@style/navigation"
+        />
   </LinearLayout>
 </LinearLayout>
+
+
