@@ -10,6 +10,7 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
 // json stuff
 import org.json.JSONObject;
@@ -199,6 +200,12 @@ public class MainActivity extends Activity {
   
     // button callbacks
     public void showMap(View view) {
+        map = mapFragment.getMap();
+
+        /* this might make the map not appear sometimes but it's better than crashing */
+        if(map == null)
+            return;
+
         getFragmentManager().beginTransaction()
             .show(mapFragment)
             .commit();
@@ -206,8 +213,6 @@ public class MainActivity extends Activity {
         placeholder1.setVisibility(View.GONE);
         placeholder2.setVisibility(View.GONE);
 
-        map = mapFragment.getMap();
-        map.setMyLocationEnabled(true);
         gameView.setVisibility(View.GONE);
 
         // find clinic and place marker
@@ -216,6 +221,13 @@ public class MainActivity extends Activity {
 
         Location location = locationService.getLocation();
 
+        // place marker at us
+        map.addMarker(new MarkerOptions()
+            .position(new LatLng(location.getLatitude(), location.getLongitude()))
+            .title("You")
+            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+
+        // find a hospital and place a marker there
         new RequestTask(Globals.SERVER + "/find_clinic", new RequestHandler() {
             public void onSuccess(String response) {
                 Log.v("MainActivity", "Hospital request succeeded");
