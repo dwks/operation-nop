@@ -106,9 +106,9 @@ public class MainActivity extends Activity {
 
         // empty notifications
         notifications.add("Current city: " + Globals.city);
-        notifications.add("Flu trend (per person): " + Globals.fluPeople[1]);
-        notifications.add("Flu trend (per hospital): " + Globals.fluHospitals[1]);
-        notifications.add("Flu trend (per workplace): " + Globals.fluWorkPlaces[1]);
+        notifications.add("Flu trend (per person): " + Globals.fluPeople[2]);
+        notifications.add("Flu trend (per hospital): " + Globals.fluHospitals[2]);
+        notifications.add("Flu trend (per workplace): " + Globals.fluWorkPlaces[2]);
         notifications.add("Air quality: " + Globals.airQuality + "/10");
         notifications.add("Risk assessment: " + Globals.status + "/10");
 
@@ -188,9 +188,9 @@ public class MainActivity extends Activity {
                         }
 
                         notifications.set(0, "Current city: " + Globals.city);
-                        notifications.set(1, "Flu trend (per person): " + (Globals.fluPeople[1] > 0 ? "up " : "down ") + new DecimalFormat("#.##").format(Math.abs(Globals.fluPeople[1])));
-                        notifications.set(2, "Flu trend (per hospital): " + (Globals.fluHospitals[1] > 0 ? "up " : "down ") + new DecimalFormat("#.##").format(Math.abs(Globals.fluHospitals[1])));
-                        notifications.set(3, "Flu trend (per workplace): " + (Globals.fluWorkPlaces[1] > 0 ? "up " : "down ") + new DecimalFormat("#.##").format(Math.abs(Globals.fluWorkPlaces[1])));
+                        notifications.set(1, "Flu trend (per person): " + (Globals.fluPeople[1] > 0 ? "up " : "down ") + new DecimalFormat("#.##").format(Math.abs(Globals.fluPeople[2])) + "%");
+                        notifications.set(2, "Flu trend (per hospital): " + (Globals.fluHospitals[1] > 0 ? "up " : "down ") + new DecimalFormat("#.##").format(Math.abs(Globals.fluHospitals[2])) + "%");
+                        notifications.set(3, "Flu trend (per workplace): " + (Globals.fluWorkPlaces[1] > 0 ? "up " : "down ") + new DecimalFormat("#.##").format(Math.abs(Globals.fluWorkPlaces[2])) + "%");
                         notifications.set(4, "Air quality: " + Globals.airQuality + "/10");
                         notifications.set(5, "Risk assessment: " + new DecimalFormat("#.##").format(Globals.status) + "/10");
 
