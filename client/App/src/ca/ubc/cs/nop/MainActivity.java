@@ -230,7 +230,7 @@ public class MainActivity extends Activity {
         Intent intent = new Intent(this, LocationService.class);
         bindService(intent, locationServiceConnection, Context.BIND_AUTO_CREATE);
         timer.removeCallbacks(pollTask);
-        timer.postDelayed(pollTask, 5000);
+        timer.postDelayed(pollTask, 200);
     }
 
     @Override
