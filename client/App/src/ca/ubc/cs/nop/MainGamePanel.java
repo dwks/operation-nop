@@ -8,7 +8,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 public class MainGamePanel extends SurfaceView {
-final static public String tag = "MainActivity";
+final static public String tag = "MainGamePanel";
 
 private GameThread gameThread;  // For our thread needed to do logical processing without holding up the UI thread
 private SurfaceHolder holder; // For our CallBacks.. (One of the areas I don't understand!)

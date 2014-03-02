@@ -247,6 +247,8 @@ public class MainActivity extends Activity {
         bindService(intent, locationServiceConnection, Context.BIND_AUTO_CREATE);
         timer.removeCallbacks(pollTask);
         timer.postDelayed(pollTask, 200);
+
+        showMain(null);
     }
 
     @Override
