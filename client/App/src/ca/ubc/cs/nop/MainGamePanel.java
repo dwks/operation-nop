@@ -109,7 +109,7 @@ protected void onDraw(Canvas canvas) {
 
     // This is where all the bird animation stuff is drawn...
 
-    canvas.drawColor(0xb8c7cf); // background colour
+    canvas.drawColor(0xffb8c7cf); // background colour
 
     //sizing
     int birdPadding = 1;
