@@ -4,7 +4,7 @@ import logging
 import sqlite3
 
 
-DB_NAME = '../../hackathon_data/db/data.db'
+DB_NAME = 'data.db'
 COLUMN_FORMAT = '(ID INT, TIME TEXT, POS_X REAL, POS_Y REAL, VALUE REAL, MIN REAL, MAX REAL, DESC TEXT, RES0 REAL, RES1 REAL, RES2 TEXT, RES3 TEXT)'
 
 
