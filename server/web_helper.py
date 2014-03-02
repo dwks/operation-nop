@@ -24,7 +24,7 @@ def GetCityName(pos_x, pos_y):
     if response['status'] != 'OK':
         logging.error('Status not ok for (%f, %f)' % (pos_x, pos_y))
         return UNKNOWN
-    
+
     result = response['results'][0]
     city = None
     country = None
@@ -54,3 +54,23 @@ def SendRequest(url, request=None):
     except urllib2.HTTPError as e:
         logging.error('Server error: ' + str(e))
         return None
+
+
+def GetAirQuality(air_quality_site):
+    resp = SendRequest(air_quality_site + 'm')
+    if not resp:
+        logging.error('Failed to get air quality info from: ' + air_quality_site)
+        return None
+
+    start = resp.find('saqi item')
+    if start == -1:
+        logging.error('Failed to find saqi_item in: ' + air_quality_site)
+        return None
+
+    resp = resp[start:]
+    start = resp.find('>')
+    if start == -1:
+        logging.error('Failed to find > in' + air_quality_site)
+        return None  
+
+    return resp[start + 1:resp.find('<')]

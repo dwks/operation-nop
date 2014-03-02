@@ -78,6 +78,28 @@ def FindCloseClinics(pos_x, pos_y, min_results, max_results):
     return SortByDistance(rows, pos_x, pos_y, max_results)
 
 
+def FindClosest(table_name,
+                pos_x, pos_y,
+                min_results, max_results,
+                block_size, retries, block_growth):
+    # Try issuing queries with increasing block_size until a min number
+    # of results are found or we exhaust our tries.
+    for _ in range(retries):
+        db_req = ('POS_X >= %f AND POS_X <= %f AND POS_Y >= %f AND POS_Y <= %f' % 
+                  (pos_x - block_size, pos_x + block_size,
+                   pos_y - block_size, pos_y + block_size))
+        try:
+            rows = db_helper.QueryTable(table_name, db_req)
+        except db_helper.DBException as e:
+            raise HelperException(str(e))
+        else:
+            if len(rows) >= min_results:
+                break
+        block_size = block_size * block_growth
+
+    return SortByDistance(rows, pos_x, pos_y, max_results)
+
+
 def SortByDistance(rows, pos_x, pos_y, max_results):
     dist_map = {}
     schema_map = db_helper.GetSchemaMap()
@@ -116,11 +138,13 @@ def GetStatus(session_id, pos_x, pos_y):
     assert user
     username = users.GetUserName(user)
 
-    city, country, street, number = web_helper.GetCityName(pos_x, pos_y)
-
     response = {
         'status': random.randint(0, 10)
         }
+
+    # Try get location info.
+    city, country, street, number = web_helper.GetCityName(pos_x, pos_y)
+
     if city:
         response['city'] = city
     if country:
@@ -130,8 +154,24 @@ def GetStatus(session_id, pos_x, pos_y):
     if city:
         response['number'] = number
 
+    # Try get air info.
+    air_quality_site = GetAirQualitySite(pos_x, pos_y)
+    print air_quality_site
+    schema_map = db_helper.GetSchemaMap()
+    air_quality = web_helper.GetAirQuality(
+        air_quality_site[0][schema_map['RES2']])
+
+    if air_quality:
+        response['air_quality'] = air_quality
+
     return json.dumps(response)
 
+
+def GetAirQualitySite(pos_x, pos_y):
+    result = FindClosest(
+        'air_quality_sites', pos_y, pos_x, 1, 1, 0.2, 5, 5)
+    assert result
+    return result
 
 class HelperException(Exception):
     pass
