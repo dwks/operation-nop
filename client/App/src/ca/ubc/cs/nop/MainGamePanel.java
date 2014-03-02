@@ -69,6 +69,7 @@ public MainGamePanel(Context context) {
 
 //Define bitmaps for drawing:
 Paint paintBranchImg = new Paint();
+Bitmap branchImg = BitmapFactory.decodeResource(getResources(), R.drawable.branch_full);
 
 @Override
 protected void onDraw(Canvas canvas) {
@@ -81,10 +82,7 @@ protected void onDraw(Canvas canvas) {
 
     // This is where all the bird animation stuff is drawn...
 
-//    canvas.drawColor(0xb8c7cf); // background colour
-    canvas.drawColor(Color.RED); // background colour
-
-    Bitmap branchImg = BitmapFactory.decodeResource(getResources(), R.drawable.branch_full);
+    canvas.drawColor(0xb8c7cf); // background colour
 
 //    branchImg.setHeight( 50 );
 //    branchImg.setWidth( 50 );
