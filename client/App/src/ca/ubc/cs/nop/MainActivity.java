@@ -17,6 +17,9 @@ import android.os.Handler;
 // animation stuff
 import android.graphics.drawable.*;
 import android.widget.*;
+import android.view.*;
+import android.graphics.*;
+import android.content.*;
 
 public class MainActivity extends Activity
 {
@@ -32,7 +35,8 @@ public class MainActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        ImageView firstBird = (ImageView)findViewById(R.id.birdOne);
+        // Creating bird animations
+/*        ImageView firstBird = (ImageView)findViewById(R.id.birdOne);
         ImageView secondBird = (ImageView)findViewById(R.id.birdTwo);
         ImageView thirdBird = (ImageView)findViewById(R.id.birdThree);
         ImageView fourthBird = (ImageView)findViewById(R.id.birdFour);
@@ -42,7 +46,21 @@ public class MainActivity extends Activity
         setupAnimations(thirdBird);
         setupAnimations(fourthBird);
         setupAnimations(fifthBird);
+*/
 
+        setContentView(new MainGamePanel(this));
+
+
+
+/*
+
+        // setup drawing:
+        birdView canvasView = new birdView(this);
+
+        LinearLayout birdLayout = (LinearLayout)findViewById(R.id.branchtest);
+        birdLayout.addView(canvasView);
+        //setContentView(birdLayout);
+*/
         // check for google play services (required by maps api)
         Log.v("MainActivity", "Checking for Google Play Services");
         int gplayStatus = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext());
@@ -116,9 +134,20 @@ public class MainActivity extends Activity
 
 
 //    AnimationDrawable birdAnimation;
-    private void setupAnimations(ImageView firstBird) {
-        firstBird.setBackgroundResource(R.drawable.bird);
-        AnimationDrawable birdAnimation = (AnimationDrawable) firstBird.getBackground();
+    private void setupAnimations(ImageView birdie) {
+        birdie.setBackgroundResource(R.drawable.bird);
+        AnimationDrawable birdAnimation = (AnimationDrawable) birdie.getBackground();
         birdAnimation.start();
+    }
+
+    class birdView extends SurfaceView {
+        public birdView(Context context) {
+            super(context);
+        }
+        @Override
+        protected void onDraw(Canvas canvas) {
+            Log.v("MainActivity", "Called 'onDraw'");
+            canvas.drawColor(Color.DKGRAY);
+        }
     }
 }

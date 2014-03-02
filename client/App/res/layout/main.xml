@@ -13,11 +13,20 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
+<!--
     <TextView
         android:id="@+id/text"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="Hello World, MainActivity"
+    />
+-->
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/branchtest"
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="150px"
     />
     <!-- Branch: -->
     <LinearLayout
@@ -25,7 +34,7 @@
         android:id="@+id/branch"
         android:orientation="horizontal"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="150px"
         >
             <ImageView
                 android:layout_weight="1"
