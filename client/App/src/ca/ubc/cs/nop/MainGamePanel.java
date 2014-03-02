@@ -67,8 +67,8 @@ public MainGamePanel(Context context) {
     });
 }
 
-//define bitmaps for drawing:
-Bitmap branchImg = BitmapFactory.decodeResource(getResources(), R.drawable.branch_full);
+//Define bitmaps for drawing:
+//Bitmap branchImg = BitmapFactory.decodeResource(getResources(), R.drawable.branch_full);
 
 @Override
 protected void onDraw(Canvas canvas) {
@@ -77,10 +77,15 @@ protected void onDraw(Canvas canvas) {
         return;
     }
     Log.d("MainActivitiy", "Inside onDraw"); 
-    // This is where all the bird stuff is drawn
 
-    canvas.drawColor(0xb8c7cf); // background colour 
-    canvas.drawBitmap(branchImg, 5, 5, null);
+    // This is where all the bird animation stuff is drawn...
+
+    canvas.drawColor(0xb8c7cf); // background colour
+
+//    branchImg.setHeight(50);
+//    branchImg.setWidth(50);
+//    canvas.drawBitmap(branchImg, 5, 5, null);
+
 }
 
 }
