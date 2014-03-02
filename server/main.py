@@ -10,6 +10,9 @@ import main_helper
 
 MAIN_URL = '/main'
 CLINIC_FINDER_URL = '/find_clinic'
+LOGIN_URL = '/login'
+STATUS_URL = '/status'
+
 
 class RedirectToMainHandler(webapp2.RequestHandler):
     def get(self):
@@ -20,6 +23,11 @@ class MainHandler(webapp2.RequestHandler):
     def get(self):
         self.response.write('hello world')
         self.response.status = 200
+
+    def post(self):
+        self.response.write('hello world')
+        self.response.status = 200
+
 
 class ClinicFinderHandler(webapp2.RequestHandler):
     def post(self):
@@ -44,11 +52,43 @@ class ClinicFinderHandler(webapp2.RequestHandler):
         else:
             self.response.out.write(result)
 
+class LoginHandler(webapp2.RequestHandler):
+    def post(self):
+        try:
+            username = main_helper.ValidateArg(self.request, 'username', 'str')
+            password = main_helper.ValidateArg(self.request, 'password', 'str')
+        except main_helper.HelperException as e:
+            self.response.out.write('Invalid request - ' + str(e))
+            self.response.status = 400
+            return
+
+        try:
+            response = main_helper.LoginOrCreateUser(username, password)
+            self.response.out.write(response)
+        except main_helper.HelperException as e:
+            self.response.status = 400
+
+
+class StatusHandler(webapp2.RequestHandler):
+    def post(self):
+        try:
+            session_id = main_helper.ValidateArg(self.request, 'session_id', 'str')
+        except main_helper.HelperException as e:
+            self.response.out.write('Invalid request - ' + str(e))
+            self.response.status = 400
+            return
+
+        response = main_helper.GetStatus(session_id)
+        if response:
+            self.response.out.write(response)    
+
 
 web_app = webapp2.WSGIApplication([
     ('/', RedirectToMainHandler),
     (MAIN_URL, MainHandler),
     (CLINIC_FINDER_URL, ClinicFinderHandler),
+    (LOGIN_URL, LoginHandler),
+    (STATUS_URL, StatusHandler),
 ], debug=True)
 
 

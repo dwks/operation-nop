@@ -28,6 +28,7 @@ import android.os.Bundle;
 import android.app.Dialog;
 import android.view.View;
 import android.util.Log;
+import android.os.Handler;
 
 public class MainActivity
     extends Activity
@@ -35,6 +36,8 @@ public class MainActivity
         GooglePlayServicesClient.OnConnectionFailedListener,
         LocationListener
 {
+    public static final String SERVER = "http://sirius.nss.cs.ubc.ca:8080";
+
     private GoogleMap gmap;
     private LocationClient locationClient;
     private boolean locationServicesConnected = false;
@@ -143,5 +146,32 @@ public class MainActivity
         Log.v("MainActivity", "Creating location client");
         locationClient = new LocationClient(this, this, this);
         locationClient.connect();
+
+        setupNotificationQuery();
     }
+
+    private Handler handler = new Handler();
+    private static final int NOTIFICATION_PERIOD = 5*1000;
+
+    private void setupNotificationQuery() {
+        handler.removeCallbacks(requestNotifications);
+        handler.postDelayed(requestNotifications, NOTIFICATION_PERIOD);
+        Log.v("MainActivity", "set up notification timer");
+    }
+
+    private Runnable requestNotifications = new Runnable() {
+        public void run() {
+            new RequestTask(SERVER + "/status", new RequestHandler() {
+                public void onSuccess(String response) {
+                    Log.v("MainActivity", "Got status: " + response);
+                }
+
+                public void onFailure() {
+                    Log.v("MainActivity", "Failed to retrieve status");
+                }
+            }).execute();
+
+            handler.postDelayed(this, NOTIFICATION_PERIOD);
+        }
+    };
 }
