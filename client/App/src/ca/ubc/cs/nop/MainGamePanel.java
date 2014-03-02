@@ -2,8 +2,7 @@
 package ca.ubc.cs.nop;
 
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Color;
+import android.graphics.*;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -68,16 +67,20 @@ public MainGamePanel(Context context) {
     });
 }
 
+//define bitmaps for drawing:
+Bitmap branchImg = BitmapFactory.decodeResource(getResources(), R.drawable.branch_full);
+
 @Override
 protected void onDraw(Canvas canvas) {
-//This is where we draw stuff..  since this is just a skeleton demo, we only draw the color Dark Grey so we can visibly see that we actually accomplished something with the surfaceview drawing
-        if (canvas == null) {
-            gameThread.setRunning(false); // Stop the Thread from running because the surface was destroyed.  Can't play a game with no surface!!  
-            return;
-        }
-    Log.d("MainActivitiy", "Inside onDraw"); 
-    canvas.drawColor(Color.RED); // You can change the Color to whatever color you want, for this demo I just used Color.DKGRAY 
-
+    if (canvas == null) {
+        gameThread.setRunning(false); // Stop the Thread from running because the surface was destroyed.  Can't play a game with no surface!!  
+        return;
     }
+    Log.d("MainActivitiy", "Inside onDraw"); 
+    // This is where all the bird stuff is drawn
+
+    canvas.drawColor(0xb8c7cf); // background colour 
+    canvas.drawBitmap(branchImg, 5, 5, null);
+}
 
 }
