@@ -68,7 +68,7 @@ public MainGamePanel(Context context) {
 }
 
 //Define bitmaps for drawing:
-//Bitmap branchImg = BitmapFactory.decodeResource(getResources(), R.drawable.branch_full);
+Paint paintBranchImg = new Paint();
 
 @Override
 protected void onDraw(Canvas canvas) {
@@ -84,9 +84,15 @@ protected void onDraw(Canvas canvas) {
 //    canvas.drawColor(0xb8c7cf); // background colour
     canvas.drawColor(Color.RED); // background colour
 
+    Bitmap branchImg = BitmapFactory.decodeResource(getResources(), R.drawable.branch_full);
+
+//    branchImg.setHeight( 50 );
+//    branchImg.setWidth( 50 );
+
+
 //    branchImg.setHeight( canvas.getHeight() );
 //    branchImg.setWidth( canvas.getWidth() );
-//    canvas.drawBitmap(branchImg, 0, 5, null);
+    canvas.drawBitmap(branchImg, 0, 5, paintBranchImg);
 
 }
 
