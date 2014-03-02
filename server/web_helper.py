@@ -69,6 +69,27 @@ def GetAirQuality(air_quality_site):
         logging.error('Executing aqicn.pl failed: ' + str(e))
         return None
 
+    if not air_quality_str:
+        logging.error('Failed on perl - trying urllib: ' + air_quality_site)
+        resp = SendRequest(air_quality_site + 'm/')
+
+        if not resp:
+            logging.error('Failed to get air quality info from: ' + air_quality_site)
+            return None
+
+        start = resp.find('saqi item')
+        if start == -1:
+            logging.error('Failed to find saqi_item in: ' + air_quality_site)
+            return None
+ 
+        resp = resp[start:]
+        start = resp.find('>')
+        if start == -1:
+            logging.error('Failed to find > in' + air_quality_site)
+            return None  
+ 
+        air_quality_str =resp[start + 1:resp.find('<')]
+
     try:
         air_quality = float(air_quality_str)
     except ValueError:
