@@ -106,7 +106,6 @@ public class RequestTask extends AsyncTask<Void, Void, Boolean> {
     @Override
     protected void onPostExecute(Boolean ok) {
         Log.v("RequestTask", "Post-execute: " + (ok? "success: <" + response + ">" : "failure"));
-        Log.v("RequestTask", "Response length: " + response.length());
 
         if(ok) {
             Log.v("RequestTask", "Calling success handler");

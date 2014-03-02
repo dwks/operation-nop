@@ -32,8 +32,10 @@ public class MainActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        LinearLayout mainLayout = (LinearLayout)findViewById(R.id.mainLayout);
-        setupAnimations(mainLayout);
+        ImageView firstBird = (ImageView)findViewById(R.id.birdOne);
+        ImageView secondBird = (ImageView)findViewById(R.id.birdTwo);
+        setupAnimations(firstBird);
+        setupAnimations(secondBird);
 
         // check for google play services (required by maps api)
         Log.v("MainActivity", "Checking for Google Play Services");
@@ -107,8 +109,10 @@ public class MainActivity extends Activity
     };
 
 
-    AnimationDrawable birdAnimation;
-    private void setupAnimations(LinearLayout mainLayout) {
-        mainLayout.setBackgroundResource(R.drawable.bird);
+//    AnimationDrawable birdAnimation;
+    private void setupAnimations(ImageView firstBird) {
+        firstBird.setBackgroundResource(R.drawable.bird);
+        AnimationDrawable birdAnimation = (AnimationDrawable) firstBird.getBackground();
+        birdAnimation.start();
     }
 }
