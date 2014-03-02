@@ -6,7 +6,7 @@ import android.util.Log;
 
 
 public class GameThread extends Thread{
-final static public String tag = "MainActivity";
+final static public String tag = "GameThread";
 
 
 private MainGamePanel view; 
