@@ -1,10 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<!-- app flows from top to bottom -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
-  <Button
-    android:layout_width="50dp"
-    android:layout_height="50dp"
-    android:text="@string/test"
-    android:onClick="test" />
-</RelativeLayout>
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:gravity="bottom">
+  
+  <!-- container for content views, which are generated on the fly -->
+  <RelativeLayout
+    android:id="@+id/container"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_weight="4">
+  </RelativeLayout>
+
+  <!-- navigation buttons -->
+  <LinearLayout
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1">
+      <Button
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:text="Map"
+        android:onClick="showMap"
+        android:layout_weight="1" />
+      <Button
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:text="Main"
+        android:onClick="showMain"
+        android:layout_weight="1"
+        />
+      <Button
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:text="Notifications"
+        android:onClick="showNotifications"
+        android:layout_weight="1" />
+  </LinearLayout>
+</LinearLayout>

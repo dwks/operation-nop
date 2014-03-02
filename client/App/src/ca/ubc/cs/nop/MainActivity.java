@@ -5,6 +5,9 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 
+// google maps stuff
+import com.google.android.gms.maps.MapFragment;
+
 // android stuff
 import android.app.Activity;
 import android.content.Context;
@@ -18,6 +21,8 @@ import android.view.View;
 import android.util.Log;
 import android.location.Location;
 import android.widget.Toast;
+import android.widget.Button;
+import android.widget.RelativeLayout;
 
 public class MainActivity extends Activity {
     // location service connection
@@ -36,6 +41,11 @@ public class MainActivity extends Activity {
             locationService = null;
         }
     };
+
+    RelativeLayout container;
+    MapFragment mapFragment;
+    Button placeholder1;
+    Button placeholder2;
 
     // activity lifecycle
     @Override
@@ -59,6 +69,35 @@ public class MainActivity extends Activity {
 
         else
             Log.v("MainActivity", "Google Play Services up-to-date");
+
+        // create auxiliary views
+        mapFragment = MapFragment.newInstance();
+
+        placeholder1 = new Button(this);
+        placeholder1.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.FILL_PARENT, RelativeLayout.LayoutParams.FILL_PARENT));
+        placeholder1.setText("~");
+
+        placeholder2 = new Button(this);
+        placeholder2.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.FILL_PARENT, RelativeLayout.LayoutParams.FILL_PARENT));
+        placeholder2.setText("~");
+
+        // find container view
+        container = (RelativeLayout) findViewById(R.id.container);
+
+        // add all views to container
+        getFragmentManager().beginTransaction()
+            .add(R.id.container, mapFragment)
+            .commit();
+
+        container.addView(placeholder1);
+        container.addView(placeholder2);
+
+        // show main view
+        getFragmentManager().beginTransaction()
+            .hide(mapFragment)
+            .commit();
+
+        placeholder2.setVisibility(View.GONE);
     }
 
     @Override
@@ -79,6 +118,35 @@ public class MainActivity extends Activity {
     }
 
     // button callbacks
+    public void showMap(View view) {
+        getFragmentManager().beginTransaction()
+            .show(mapFragment)
+            .commit();
+
+        placeholder1.setVisibility(View.GONE);
+        placeholder2.setVisibility(View.GONE);
+    }
+
+    public void showMain(View view) {
+        placeholder1.setVisibility(View.VISIBLE);
+
+        getFragmentManager().beginTransaction()
+            .hide(mapFragment)
+            .commit();
+
+        placeholder2.setVisibility(View.GONE);
+    }
+
+    public void showNotifications(View view) {
+        placeholder2.setVisibility(View.VISIBLE);
+
+        getFragmentManager().beginTransaction()
+            .hide(mapFragment)
+            .commit();
+
+        placeholder1.setVisibility(View.GONE);
+    }
+
     public void test(View view) {
         if(!locationService.isAvailable()) {
             Toast.makeText(getApplicationContext(), "Location services unavailable", Toast.LENGTH_SHORT).show();
