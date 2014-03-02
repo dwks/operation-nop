@@ -2,7 +2,7 @@
 <resources>
     <style name="MyTheme" parent="android:Theme.Holo.Light">
         <item name="android:windowNoTitle">true</item>
-        <item name="android:windowBackground">#E3E3E3</item>
+<!--        <item name="android:windowBackground">#E3E3E3</item> -->
         <item name="android:listViewStyle">@style/MyListView</item>
     </style>
 
