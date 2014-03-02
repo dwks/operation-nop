@@ -159,13 +159,21 @@ def GetStatus(session_id, pos_x, pos_y):
         response['number'] = number
 
     # Try get air info.
-    air_quality_site = GetAirQualitySite(pos_x, pos_y)
+    air_quality_sites = GetAirQualitySite(pos_x, pos_y)
     schema_map = db_helper.GetSchemaMap()
-    air_quality = web_helper.GetAirQuality(
-        air_quality_site[0][schema_map['RES2']])
 
-    if air_quality:
-        response['air_quality'] = air_quality
+    air_quality = 0
+    sample_count = 0
+    for air_quality_site in air_quality_sites:
+        sample = web_helper.GetAirQuality(
+            air_quality_site[schema_map['RES2']])
+        if sample:
+            air_quality += sample
+            sample_count += 1.0
+
+    if sample_count:
+        response['air_quality'] = air_quality / sample_count
+        logging.info('Air quality: ' + str(response['air_quality']))
 
     # Try get flu info.
     flu_people, flu_hospitals, flu_work_places = GetFluInfo()
@@ -184,7 +192,7 @@ def GetStatus(session_id, pos_x, pos_y):
 
 def GetAirQualitySite(pos_x, pos_y):
     result = FindClosest(
-        'air_quality_sites', pos_y, pos_x, 1, 1, 0.2, 5, 5)
+        'air_quality_sites', pos_y, pos_x, 1, 2, 0.2, 5, 5)
     assert result
     return result
 
