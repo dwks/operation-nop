@@ -5,6 +5,6 @@
   <Button
     android:layout_width="50dp"
     android:layout_height="50dp"
-    android:text="@string/showMapView"
-    android:onClick="showMapView" />
+    android:text="@string/test"
+    android:onClick="test" />
 </RelativeLayout>
