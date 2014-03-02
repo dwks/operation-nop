@@ -30,6 +30,13 @@ import android.widget.Toast;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 
+// animation stuff
+import android.graphics.drawable.*;
+import android.widget.*;
+import android.view.*;
+import android.graphics.*;
+import android.content.*;
+
 public class MainActivity extends Activity {
     // location service connection
     private LocationService locationService;
@@ -53,6 +60,7 @@ public class MainActivity extends Activity {
     private MapFragment mapFragment;
     private Button placeholder1;
     private Button placeholder2;
+    private MainGamePanel gameView;
 
     // map state
     private GoogleMap map;
@@ -67,19 +75,6 @@ public class MainActivity extends Activity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-
-        /*
-        ImageView firstBird = (ImageView)findViewById(R.id.birdOne);
-        ImageView secondBird = (ImageView)findViewById(R.id.birdTwo);
-        ImageView thirdBird = (ImageView)findViewById(R.id.birdThree);
-        ImageView fourthBird = (ImageView)findViewById(R.id.birdFour);
-        ImageView fifthBird = (ImageView)findViewById(R.id.birdFive);
-        setupAnimations(firstBird);
-        setupAnimations(secondBird);
-        setupAnimations(thirdBird);
-        setupAnimations(fourthBird);
-        setupAnimations(fifthBird);
-        */
 
         // check for google play services (required by location services and maps api)
         Log.v("MainActivity", "Checking for Google Play Services");
@@ -107,6 +102,8 @@ public class MainActivity extends Activity {
         placeholder2.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.FILL_PARENT, RelativeLayout.LayoutParams.FILL_PARENT));
         placeholder2.setText("?");
 
+        gameView = new MainGamePanel(this);
+
         // find container view
         container = (RelativeLayout) findViewById(R.id.container);
 
@@ -117,6 +114,7 @@ public class MainActivity extends Activity {
 
         container.addView(placeholder1);
         container.addView(placeholder2);
+        container.addView(gameView);
 
         // show main view
         getFragmentManager().beginTransaction()
@@ -201,10 +199,12 @@ public class MainActivity extends Activity {
 
         map = mapFragment.getMap();
         map.setMyLocationEnabled(true);
+        gameView.setVisibility(View.GONE);
     }
 
     public void showMain(View view) {
         placeholder1.setVisibility(View.VISIBLE);
+        gameView.setVisibility(View.VISIBLE);
 
         getFragmentManager().beginTransaction()
             .hide(mapFragment)
@@ -215,6 +215,7 @@ public class MainActivity extends Activity {
 
     public void showNotifications(View view) {
         placeholder2.setVisibility(View.VISIBLE);
+        gameView.setVisibility(View.VISIBLE);
 
         getFragmentManager().beginTransaction()
             .hide(mapFragment)
@@ -222,22 +223,4 @@ public class MainActivity extends Activity {
 
         placeholder1.setVisibility(View.GONE);
     }
-
-    /*
-    public void test(View view) {
-        if(!locationService.isAvailable()) {
-            Toast.makeText(getApplicationContext(), "Location services unavailable", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        Location location = locationService.getLocation();
-        Toast.makeText(getApplicationContext(), "Current location: " + Location.convert(location.getLongitude(), Location.FORMAT_DEGREES) + "/" + Location.convert(location.getLatitude(), Location.FORMAT_DEGREES), Toast.LENGTH_SHORT).show();
-    }
-
-    private void setupAnimations(ImageView firstBird) {
-        firstBird.setBackgroundResource(R.drawable.bird);
-        AnimationDrawable birdAnimation = (AnimationDrawable) firstBird.getBackground();
-        birdAnimation.start();
-    }
-    */
 }

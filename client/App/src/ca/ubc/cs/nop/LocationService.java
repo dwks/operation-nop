@@ -70,8 +70,15 @@ public class LocationService extends Service
     }
 
     public Location getLocation() {
-        if(connected)
-            lastKnownLocation = client.getLastLocation();
+        try {
+            if(connected)
+                lastKnownLocation = client.getLastLocation();
+        }
+
+        catch(IllegalStateException e) {
+            // WHAT IS EVEN CAUSING THIS
+            Log.v("LocationService", "IllegalStateException: " + e.getMessage());
+        }
 
         return lastKnownLocation;
     }
